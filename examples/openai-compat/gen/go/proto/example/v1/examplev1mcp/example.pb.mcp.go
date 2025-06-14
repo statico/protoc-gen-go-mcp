@@ -4,7 +4,7 @@
 package examplev1mcp
 
 import (
-	v1 "github.com/redpanda-data/protoc-gen-go-mcp/example-openai-compat/gen/go/proto/example/v1"
+	v1 "github.com/redpanda-data/protoc-gen-go-mcp/examples/openai-compat/gen/go/proto/example/v1"
 )
 
 import (
@@ -125,7 +125,6 @@ func ForwardToConnectExampleServiceClient(s *mcpserver.MCPServer, client Connect
 		var req v1.CreateExampleRequest
 
 		message := request.Params.Arguments
-		runtime.FixOpenAI(req.ProtoReflect().Descriptor(), message)
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -155,7 +154,6 @@ func ForwardToExampleServiceClient(s *mcpserver.MCPServer, client ExampleService
 		var req v1.CreateExampleRequest
 
 		message := request.Params.Arguments
-		runtime.FixOpenAI(req.ProtoReflect().Descriptor(), message)
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {

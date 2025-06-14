@@ -22,7 +22,7 @@ import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	v1 "github.com/redpanda-data/protoc-gen-go-mcp/example-openai-compat/gen/go/proto/example/v1"
+	v1 "github.com/redpanda-data/protoc-gen-go-mcp/examples/openai-compat/gen/go/proto/example/v1"
 	http "net/http"
 	strings "strings"
 )

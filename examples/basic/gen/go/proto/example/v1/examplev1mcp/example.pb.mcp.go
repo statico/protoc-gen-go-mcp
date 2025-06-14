@@ -4,7 +4,7 @@
 package examplev1mcp
 
 import (
-	v1 "github.com/redpanda-data/protoc-gen-go-mcp/example/gen/go/proto/example/v1"
+	v1 "github.com/redpanda-data/protoc-gen-go-mcp/examples/basic/gen/go/proto/example/v1"
 )
 
 import (

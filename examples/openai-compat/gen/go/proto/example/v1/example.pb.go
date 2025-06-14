@@ -286,6 +286,7 @@ type CreateExampleRequest_Nested struct {
 	state         protoimpl.MessageState               `protogen:"open.v1"`
 	SomeField     string                               `protobuf:"bytes,1,opt,name=some_field,json=someField,proto3" json:"some_field,omitempty"`
 	Nested2       *CreateExampleRequest_Nested_Nested2 `protobuf:"bytes,2,opt,name=nested2,proto3" json:"nested2,omitempty"`
+	Labels        map[string]string                    `protobuf:"bytes,3,rep,name=labels,proto3" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -330,6 +331,13 @@ func (x *CreateExampleRequest_Nested) GetSomeField() string {
 func (x *CreateExampleRequest_Nested) GetNested2() *CreateExampleRequest_Nested_Nested2 {
 	if x != nil {
 		return x.Nested2
+	}
+	return nil
+}
+
+func (x *CreateExampleRequest_Nested) GetLabels() map[string]string {
+	if x != nil {
+		return x.Labels
 	}
 	return nil
 }
@@ -396,7 +404,7 @@ type CreateExampleRequest_Nested_Nested2_Nested3 struct {
 
 func (x *CreateExampleRequest_Nested_Nested2_Nested3) Reset() {
 	*x = CreateExampleRequest_Nested_Nested2_Nested3{}
-	mi := &file_proto_example_v1_example_proto_msgTypes[6]
+	mi := &file_proto_example_v1_example_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -408,7 +416,7 @@ func (x *CreateExampleRequest_Nested_Nested2_Nested3) String() string {
 func (*CreateExampleRequest_Nested_Nested2_Nested3) ProtoMessage() {}
 
 func (x *CreateExampleRequest_Nested_Nested2_Nested3) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_example_v1_example_proto_msgTypes[6]
+	mi := &file_proto_example_v1_example_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -443,8 +451,7 @@ var File_proto_example_v1_example_proto protoreflect.FileDescriptor
 const file_proto_example_v1_example_proto_rawDesc = "" +
 	"\n" +
 	"\x1eproto/example/v1/example.proto\x12\n" +
-	"example.v1\"\xf3\n" +
-	"\n" +
+	"example.v1\"\xfb\v\n" +
 	"\x14CreateExampleRequest\x12\x1d\n" +
 	"\n" +
 	"some_int32\x18\x01 \x01(\x05R\tsomeInt32\x12\x1d\n" +
@@ -462,18 +469,22 @@ const file_proto_example_v1_example_proto_rawDesc = "" +
 	"first_item\x18\n" +
 	" \x01(\tH\x00R\tfirstItem\x12!\n" +
 	"\vsecond_item\x18\v \x01(\x05H\x00R\n" +
-	"secondItem\x1a\x89\x03\n" +
+	"secondItem\x1a\x91\x04\n" +
 	"\x06Nested\x12\x1d\n" +
 	"\n" +
 	"some_field\x18\x01 \x01(\tR\tsomeField\x12I\n" +
-	"\anested2\x18\x02 \x01(\v2/.example.v1.CreateExampleRequest.Nested.Nested2R\anested2\x1a\x94\x02\n" +
+	"\anested2\x18\x02 \x01(\v2/.example.v1.CreateExampleRequest.Nested.Nested2R\anested2\x12K\n" +
+	"\x06labels\x18\x03 \x03(\v23.example.v1.CreateExampleRequest.Nested.LabelsEntryR\x06labels\x1a\x94\x02\n" +
 	"\aNested2\x12*\n" +
 	"\x11some_nested_field\x18\x01 \x01(\tR\x0fsomeNestedField\x12Q\n" +
 	"\anested3\x18\x02 \x01(\v27.example.v1.CreateExampleRequest.Nested.Nested2.Nested3R\anested3\x1a\x89\x01\n" +
 	"\aNested3\x12<\n" +
 	"\x1bsome_nested_in_nested_field\x18\x01 \x01(\tR\x17someNestedInNestedField\x12,\n" +
 	"\x0foptional_string\x18\x02 \x01(\tH\x00R\x0eoptionalString\x88\x01\x01B\x12\n" +
-	"\x10_optional_string\x1al\n" +
+	"\x10_optional_string\x1a9\n" +
+	"\vLabelsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1al\n" +
 	"\x15MapWithNestedValEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12=\n" +
 	"\x05value\x18\x02 \x01(\v2'.example.v1.CreateExampleRequest.NestedR\x05value:\x028\x01\x1aw\n" +
@@ -491,8 +502,8 @@ const file_proto_example_v1_example_proto_rawDesc = "" +
 	"\vsome_string\x18\x01 \x01(\tR\n" +
 	"someString2f\n" +
 	"\x0eExampleService\x12T\n" +
-	"\rCreateExample\x12 .example.v1.CreateExampleRequest\x1a!.example.v1.CreateExampleResponseB\xbd\x01\n" +
-	"\x0ecom.example.v1B\fExampleProtoP\x01ZTgithub.com/redpanda-data/protoc-gen-go-mcp/example/gen/go/proto/example/v1;examplev1\xa2\x02\x03EXX\xaa\x02\n" +
+	"\rCreateExample\x12 .example.v1.CreateExampleRequest\x1a!.example.v1.CreateExampleResponseB\xcc\x01\n" +
+	"\x0ecom.example.v1B\fExampleProtoP\x01Zcgithub.com/redpanda-data/protoc-gen-go-mcp/examples/openai-compat/gen/go/proto/example/v1;examplev1\xa2\x02\x03EXX\xaa\x02\n" +
 	"Example.V1\xca\x02\n" +
 	"Example\\V1\xe2\x02\x16Example\\V1\\GPBMetadata\xea\x02\vExample::V1b\x06proto3"
 
@@ -509,7 +520,7 @@ func file_proto_example_v1_example_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_example_v1_example_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_example_v1_example_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_proto_example_v1_example_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_proto_example_v1_example_proto_goTypes = []any{
 	(CreateExampleRequest_SomeEnum)(0),  // 0: example.v1.CreateExampleRequest.SomeEnum
 	(*CreateExampleRequest)(nil),        // 1: example.v1.CreateExampleRequest
@@ -517,25 +528,27 @@ var file_proto_example_v1_example_proto_goTypes = []any{
 	(*CreateExampleRequest_Nested)(nil), // 3: example.v1.CreateExampleRequest.Nested
 	nil,                                 // 4: example.v1.CreateExampleRequest.MapWithNestedValEntry
 	nil,                                 // 5: example.v1.CreateExampleRequest.MapWithNestedValNoStringKeyEntry
-	(*CreateExampleRequest_Nested_Nested2)(nil),         // 6: example.v1.CreateExampleRequest.Nested.Nested2
-	(*CreateExampleRequest_Nested_Nested2_Nested3)(nil), // 7: example.v1.CreateExampleRequest.Nested.Nested2.Nested3
+	(*CreateExampleRequest_Nested_Nested2)(nil), // 6: example.v1.CreateExampleRequest.Nested.Nested2
+	nil, // 7: example.v1.CreateExampleRequest.Nested.LabelsEntry
+	(*CreateExampleRequest_Nested_Nested2_Nested3)(nil), // 8: example.v1.CreateExampleRequest.Nested.Nested2.Nested3
 }
 var file_proto_example_v1_example_proto_depIdxs = []int32{
-	0, // 0: example.v1.CreateExampleRequest.some_enum:type_name -> example.v1.CreateExampleRequest.SomeEnum
-	3, // 1: example.v1.CreateExampleRequest.nested:type_name -> example.v1.CreateExampleRequest.Nested
-	4, // 2: example.v1.CreateExampleRequest.map_with_nested_val:type_name -> example.v1.CreateExampleRequest.MapWithNestedValEntry
-	5, // 3: example.v1.CreateExampleRequest.map_with_nested_val_no_string_key:type_name -> example.v1.CreateExampleRequest.MapWithNestedValNoStringKeyEntry
-	6, // 4: example.v1.CreateExampleRequest.Nested.nested2:type_name -> example.v1.CreateExampleRequest.Nested.Nested2
-	3, // 5: example.v1.CreateExampleRequest.MapWithNestedValEntry.value:type_name -> example.v1.CreateExampleRequest.Nested
-	3, // 6: example.v1.CreateExampleRequest.MapWithNestedValNoStringKeyEntry.value:type_name -> example.v1.CreateExampleRequest.Nested
-	7, // 7: example.v1.CreateExampleRequest.Nested.Nested2.nested3:type_name -> example.v1.CreateExampleRequest.Nested.Nested2.Nested3
-	1, // 8: example.v1.ExampleService.CreateExample:input_type -> example.v1.CreateExampleRequest
-	2, // 9: example.v1.ExampleService.CreateExample:output_type -> example.v1.CreateExampleResponse
-	9, // [9:10] is the sub-list for method output_type
-	8, // [8:9] is the sub-list for method input_type
-	8, // [8:8] is the sub-list for extension type_name
-	8, // [8:8] is the sub-list for extension extendee
-	0, // [0:8] is the sub-list for field type_name
+	0,  // 0: example.v1.CreateExampleRequest.some_enum:type_name -> example.v1.CreateExampleRequest.SomeEnum
+	3,  // 1: example.v1.CreateExampleRequest.nested:type_name -> example.v1.CreateExampleRequest.Nested
+	4,  // 2: example.v1.CreateExampleRequest.map_with_nested_val:type_name -> example.v1.CreateExampleRequest.MapWithNestedValEntry
+	5,  // 3: example.v1.CreateExampleRequest.map_with_nested_val_no_string_key:type_name -> example.v1.CreateExampleRequest.MapWithNestedValNoStringKeyEntry
+	6,  // 4: example.v1.CreateExampleRequest.Nested.nested2:type_name -> example.v1.CreateExampleRequest.Nested.Nested2
+	7,  // 5: example.v1.CreateExampleRequest.Nested.labels:type_name -> example.v1.CreateExampleRequest.Nested.LabelsEntry
+	3,  // 6: example.v1.CreateExampleRequest.MapWithNestedValEntry.value:type_name -> example.v1.CreateExampleRequest.Nested
+	3,  // 7: example.v1.CreateExampleRequest.MapWithNestedValNoStringKeyEntry.value:type_name -> example.v1.CreateExampleRequest.Nested
+	8,  // 8: example.v1.CreateExampleRequest.Nested.Nested2.nested3:type_name -> example.v1.CreateExampleRequest.Nested.Nested2.Nested3
+	1,  // 9: example.v1.ExampleService.CreateExample:input_type -> example.v1.CreateExampleRequest
+	2,  // 10: example.v1.ExampleService.CreateExample:output_type -> example.v1.CreateExampleResponse
+	10, // [10:11] is the sub-list for method output_type
+	9,  // [9:10] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_proto_example_v1_example_proto_init() }
@@ -547,14 +560,14 @@ func file_proto_example_v1_example_proto_init() {
 		(*CreateExampleRequest_FirstItem)(nil),
 		(*CreateExampleRequest_SecondItem)(nil),
 	}
-	file_proto_example_v1_example_proto_msgTypes[6].OneofWrappers = []any{}
+	file_proto_example_v1_example_proto_msgTypes[7].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_example_v1_example_proto_rawDesc), len(file_proto_example_v1_example_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   7,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
