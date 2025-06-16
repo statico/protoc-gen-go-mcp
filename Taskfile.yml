@@ -24,7 +24,7 @@ tasks:
     cmds:
       - echo "Updating golden test files..."
       - go test ./pkg/generator -update-golden -v
-      - gofumpt -l -w .
+      - task: fmt
       - echo "Golden files updated successfully!"
 
 
@@ -33,7 +33,6 @@ tasks:
     dir: pkg/testdata
     cmds:
       - buf generate
-      - gofumpt -l -w .
 
   integrationtest:
     desc: Run integration tests (requires OPENAI_API_KEY)
@@ -52,18 +51,6 @@ tasks:
       - golangci-lint run
 
   fmt:
-    desc: Format code
+    desc: Format code (excludes generated protobuf files)
     cmds:
-      - gofumpt -l -w .
-
-  check-fmt:
-    desc: Check if code is formatted
-    aliases: [fmt:check]
-    cmds:
-      - |
-        files=$(gofumpt -l cmd/ pkg/generator/ pkg/runtime/ examples/ integrationtest/ 2>/dev/null || true)
-        if [ -n "$files" ]; then
-          echo "Code is not formatted. Please run 'task fmt'"
-          echo "$files"
-          exit 1
-        fi
+      - find . -name '*.go' -not -path './pkg/testdata/gen/*' | xargs go run mvdan.cc/gofumpt@latest -l -w

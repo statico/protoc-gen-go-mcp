@@ -307,12 +307,6 @@ func TestFullGeneration(t *testing.T) {
 		t.Fatalf("Failed to generate current files: %v\nOutput: %s", err, output)
 	}
 
-	cmd = exec.Command("task", "fmt")
-	output, err = cmd.CombinedOutput()
-	if err != nil {
-		t.Fatalf("Failed to generate current files: %v\nOutput: %s", err, output)
-	}
-
 	// Find all .pb.mcp.go files in gen/go and compare with golden/
 	err = filepath.Walk("gen/go", func(path string, info os.FileInfo, err error) error {
 		if err != nil {

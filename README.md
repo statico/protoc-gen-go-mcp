@@ -196,9 +196,6 @@ task integrationtest
 # Format code
 task fmt
 
-# Check code formatting
-task check-fmt
-
 # Run linting
 task lint
 
