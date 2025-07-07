@@ -295,6 +295,15 @@ func TestFullGeneration(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to generate golden files: %v\nOutput: %s", err, output)
 		}
+
+		// Also generate googleapis golden files
+		t.Logf("Generating googleapis golden files...")
+		cmd = exec.Command("buf", "generate", "buf.build/googleapis/googleapis", "--template", "buf.gen.golden.yaml")
+		output, err = cmd.CombinedOutput()
+		if err != nil {
+			t.Fatalf("Failed to generate googleapis golden files: %v\nOutput: %s", err, output)
+		}
+
 		t.Logf("Updated golden files")
 		return
 	}
@@ -303,6 +312,20 @@ func TestFullGeneration(t *testing.T) {
 	t.Logf("Generating current files...")
 	cmd := exec.Command("buf", "generate")
 	output, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("Failed to generate current files: %v\nOutput: %s", err, output)
+	}
+
+	// Also generate googleapis files
+	t.Logf("Generating googleapis files...")
+	cmd = exec.Command("buf", "generate", "buf.build/googleapis/googleapis")
+	output, err = cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("Failed to generate googleapis files: %v\nOutput: %s", err, output)
+	}
+
+	cmd = exec.Command("../../taskw", "fmt")
+	output, err = cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("Failed to generate current files: %v\nOutput: %s", err, output)
 	}

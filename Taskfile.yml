@@ -32,7 +32,9 @@ tasks:
     desc: Generate testdata (including integration test protos)
     dir: pkg/testdata
     cmds:
-      - buf generate
+      - buf generate buf.build/googleapis/googleapis
+      - buf generate --include-imports
+      - gofumpt -l -w .
 
   integrationtest:
     desc: Run integration tests (requires OPENAI_API_KEY)
