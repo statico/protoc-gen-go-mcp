@@ -16,7 +16,6 @@ import (
 	"connectrpc.com/connect"
 	grpc "google.golang.org/grpc"
 	"github.com/redpanda-data/protoc-gen-go-mcp/pkg/runtime"
-	"net/url"
 )
 
 var (
@@ -42,9 +41,9 @@ func RegisterTestServiceHandler(s *mcpserver.MCPServer, srv TestServiceServer, o
 		opt(config)
 	}
 	CreateItemTool := TestService_CreateItemTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		CreateItemTool = runtime.AddURLFieldToTool(CreateItemTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		CreateItemTool = runtime.AddExtraPropertiesToTool(CreateItemTool, config.ExtraProperties)
 	}
 
 	s.AddTool(CreateItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -52,14 +51,10 @@ func RegisterTestServiceHandler(s *mcpserver.MCPServer, srv TestServiceServer, o
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -85,9 +80,9 @@ func RegisterTestServiceHandler(s *mcpserver.MCPServer, srv TestServiceServer, o
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	GetItemTool := TestService_GetItemTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		GetItemTool = runtime.AddURLFieldToTool(GetItemTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		GetItemTool = runtime.AddExtraPropertiesToTool(GetItemTool, config.ExtraProperties)
 	}
 
 	s.AddTool(GetItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -95,14 +90,10 @@ func RegisterTestServiceHandler(s *mcpserver.MCPServer, srv TestServiceServer, o
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -128,9 +119,9 @@ func RegisterTestServiceHandler(s *mcpserver.MCPServer, srv TestServiceServer, o
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	ProcessWellKnownTypesTool := TestService_ProcessWellKnownTypesTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		ProcessWellKnownTypesTool = runtime.AddURLFieldToTool(ProcessWellKnownTypesTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		ProcessWellKnownTypesTool = runtime.AddExtraPropertiesToTool(ProcessWellKnownTypesTool, config.ExtraProperties)
 	}
 
 	s.AddTool(ProcessWellKnownTypesTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -138,14 +129,10 @@ func RegisterTestServiceHandler(s *mcpserver.MCPServer, srv TestServiceServer, o
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -179,9 +166,9 @@ func RegisterTestServiceHandlerOpenAI(s *mcpserver.MCPServer, srv TestServiceSer
 		opt(config)
 	}
 	CreateItemToolOpenAI := TestService_CreateItemToolOpenAI
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		CreateItemToolOpenAI = runtime.AddURLFieldToTool(CreateItemToolOpenAI, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		CreateItemToolOpenAI = runtime.AddExtraPropertiesToTool(CreateItemToolOpenAI, config.ExtraProperties)
 	}
 
 	s.AddTool(CreateItemToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -189,14 +176,10 @@ func RegisterTestServiceHandlerOpenAI(s *mcpserver.MCPServer, srv TestServiceSer
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -224,9 +207,9 @@ func RegisterTestServiceHandlerOpenAI(s *mcpserver.MCPServer, srv TestServiceSer
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	GetItemToolOpenAI := TestService_GetItemToolOpenAI
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		GetItemToolOpenAI = runtime.AddURLFieldToTool(GetItemToolOpenAI, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		GetItemToolOpenAI = runtime.AddExtraPropertiesToTool(GetItemToolOpenAI, config.ExtraProperties)
 	}
 
 	s.AddTool(GetItemToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -234,14 +217,10 @@ func RegisterTestServiceHandlerOpenAI(s *mcpserver.MCPServer, srv TestServiceSer
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -269,9 +248,9 @@ func RegisterTestServiceHandlerOpenAI(s *mcpserver.MCPServer, srv TestServiceSer
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	ProcessWellKnownTypesToolOpenAI := TestService_ProcessWellKnownTypesToolOpenAI
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		ProcessWellKnownTypesToolOpenAI = runtime.AddURLFieldToTool(ProcessWellKnownTypesToolOpenAI, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		ProcessWellKnownTypesToolOpenAI = runtime.AddExtraPropertiesToTool(ProcessWellKnownTypesToolOpenAI, config.ExtraProperties)
 	}
 
 	s.AddTool(ProcessWellKnownTypesToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -279,14 +258,10 @@ func RegisterTestServiceHandlerOpenAI(s *mcpserver.MCPServer, srv TestServiceSer
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -348,9 +323,9 @@ func ForwardToConnectTestServiceClient(s *mcpserver.MCPServer, client ConnectTes
 		opt(config)
 	}
 	CreateItemTool := TestService_CreateItemTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		CreateItemTool = runtime.AddURLFieldToTool(CreateItemTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		CreateItemTool = runtime.AddExtraPropertiesToTool(CreateItemTool, config.ExtraProperties)
 	}
 
 	s.AddTool(CreateItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -358,14 +333,10 @@ func ForwardToConnectTestServiceClient(s *mcpserver.MCPServer, client ConnectTes
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -390,9 +361,9 @@ func ForwardToConnectTestServiceClient(s *mcpserver.MCPServer, client ConnectTes
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	GetItemTool := TestService_GetItemTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		GetItemTool = runtime.AddURLFieldToTool(GetItemTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		GetItemTool = runtime.AddExtraPropertiesToTool(GetItemTool, config.ExtraProperties)
 	}
 
 	s.AddTool(GetItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -400,14 +371,10 @@ func ForwardToConnectTestServiceClient(s *mcpserver.MCPServer, client ConnectTes
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -432,9 +399,9 @@ func ForwardToConnectTestServiceClient(s *mcpserver.MCPServer, client ConnectTes
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	ProcessWellKnownTypesTool := TestService_ProcessWellKnownTypesTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		ProcessWellKnownTypesTool = runtime.AddURLFieldToTool(ProcessWellKnownTypesTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		ProcessWellKnownTypesTool = runtime.AddExtraPropertiesToTool(ProcessWellKnownTypesTool, config.ExtraProperties)
 	}
 
 	s.AddTool(ProcessWellKnownTypesTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -442,14 +409,10 @@ func ForwardToConnectTestServiceClient(s *mcpserver.MCPServer, client ConnectTes
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -482,9 +445,9 @@ func ForwardToTestServiceClient(s *mcpserver.MCPServer, client TestServiceClient
 		opt(config)
 	}
 	CreateItemTool := TestService_CreateItemTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		CreateItemTool = runtime.AddURLFieldToTool(CreateItemTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		CreateItemTool = runtime.AddExtraPropertiesToTool(CreateItemTool, config.ExtraProperties)
 	}
 
 	s.AddTool(CreateItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -492,14 +455,10 @@ func ForwardToTestServiceClient(s *mcpserver.MCPServer, client TestServiceClient
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -524,9 +483,9 @@ func ForwardToTestServiceClient(s *mcpserver.MCPServer, client TestServiceClient
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	GetItemTool := TestService_GetItemTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		GetItemTool = runtime.AddURLFieldToTool(GetItemTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		GetItemTool = runtime.AddExtraPropertiesToTool(GetItemTool, config.ExtraProperties)
 	}
 
 	s.AddTool(GetItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -534,14 +493,10 @@ func ForwardToTestServiceClient(s *mcpserver.MCPServer, client TestServiceClient
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -566,9 +521,9 @@ func ForwardToTestServiceClient(s *mcpserver.MCPServer, client TestServiceClient
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	ProcessWellKnownTypesTool := TestService_ProcessWellKnownTypesTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		ProcessWellKnownTypesTool = runtime.AddURLFieldToTool(ProcessWellKnownTypesTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		ProcessWellKnownTypesTool = runtime.AddExtraPropertiesToTool(ProcessWellKnownTypesTool, config.ExtraProperties)
 	}
 
 	s.AddTool(ProcessWellKnownTypesTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -576,14 +531,10 @@ func ForwardToTestServiceClient(s *mcpserver.MCPServer, client TestServiceClient
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 

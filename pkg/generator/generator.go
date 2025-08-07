@@ -65,7 +65,6 @@ import (
   "connectrpc.com/connect"
   grpc "google.golang.org/grpc"
   "github.com/redpanda-data/protoc-gen-go-mcp/pkg/runtime"
-  "net/url"
 )
 
 
@@ -97,9 +96,9 @@ func Register{{$key}}Handler(s *mcpserver.MCPServer, srv {{$key}}Server, opts ..
 
   {{- range $tool_name, $tool_val := $val }}
   {{$tool_name}}Tool := {{$key}}_{{$tool_name}}Tool
-  // Add URL field to schema if ExtractURL is enabled
-  if config.ExtractURL {
-    {{$tool_name}}Tool = runtime.AddURLFieldToTool({{$tool_name}}Tool, config.URLFieldName, config.URLDescription)
+  // Add extra properties to schema if configured
+  if len(config.ExtraProperties) > 0 {
+    {{$tool_name}}Tool = runtime.AddExtraPropertiesToTool({{$tool_name}}Tool, config.ExtraProperties)
   }
   
   s.AddTool({{$tool_name}}Tool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -107,14 +106,10 @@ func Register{{$key}}Handler(s *mcpserver.MCPServer, srv {{$key}}Server, opts ..
 
     message := request.Params.Arguments
 
-    // Extract URL if option is enabled
-    if config.ExtractURL {
-      if urlVal, ok := message[config.URLFieldName]; ok {
-        if urlStr, ok := urlVal.(string); ok {
-          if parsedURL, err := url.Parse(urlStr); err == nil {
-            ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-          }
-        }
+    // Extract extra properties if configured
+    for _, prop := range config.ExtraProperties {
+      if propVal, ok := message[prop.Name]; ok {
+        ctx = context.WithValue(ctx, prop.ContextKey, propVal)
       }
     }
 
@@ -151,9 +146,9 @@ func Register{{$key}}HandlerOpenAI(s *mcpserver.MCPServer, srv {{$key}}Server, o
 
   {{- range $tool_name, $tool_val := $val }}
   {{$tool_name}}ToolOpenAI := {{$key}}_{{$tool_name}}ToolOpenAI
-  // Add URL field to schema if ExtractURL is enabled
-  if config.ExtractURL {
-    {{$tool_name}}ToolOpenAI = runtime.AddURLFieldToTool({{$tool_name}}ToolOpenAI, config.URLFieldName, config.URLDescription)
+  // Add extra properties to schema if configured
+  if len(config.ExtraProperties) > 0 {
+    {{$tool_name}}ToolOpenAI = runtime.AddExtraPropertiesToTool({{$tool_name}}ToolOpenAI, config.ExtraProperties)
   }
   
   s.AddTool({{$tool_name}}ToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -161,14 +156,10 @@ func Register{{$key}}HandlerOpenAI(s *mcpserver.MCPServer, srv {{$key}}Server, o
 
     message := request.Params.Arguments
 
-    // Extract URL if option is enabled
-    if config.ExtractURL {
-      if urlVal, ok := message[config.URLFieldName]; ok {
-        if urlStr, ok := urlVal.(string); ok {
-          if parsedURL, err := url.Parse(urlStr); err == nil {
-            ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-          }
-        }
+    // Extract extra properties if configured
+    for _, prop := range config.ExtraProperties {
+      if propVal, ok := message[prop.Name]; ok {
+        ctx = context.WithValue(ctx, prop.ContextKey, propVal)
       }
     }
 
@@ -240,9 +231,9 @@ func ForwardToConnect{{$key}}Client(s *mcpserver.MCPServer, client Connect{{$key
 
   {{- range $tool_name, $tool_val := $val }}
   {{$tool_name}}Tool := {{$key}}_{{$tool_name}}Tool
-  // Add URL field to schema if ExtractURL is enabled
-  if config.ExtractURL {
-    {{$tool_name}}Tool = runtime.AddURLFieldToTool({{$tool_name}}Tool, config.URLFieldName, config.URLDescription)
+  // Add extra properties to schema if configured
+  if len(config.ExtraProperties) > 0 {
+    {{$tool_name}}Tool = runtime.AddExtraPropertiesToTool({{$tool_name}}Tool, config.ExtraProperties)
   }
   
   s.AddTool({{$tool_name}}Tool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -250,14 +241,10 @@ func ForwardToConnect{{$key}}Client(s *mcpserver.MCPServer, client Connect{{$key
 
     message := request.Params.Arguments
 
-    // Extract URL if option is enabled
-    if config.ExtractURL {
-      if urlVal, ok := message[config.URLFieldName]; ok {
-        if urlStr, ok := urlVal.(string); ok {
-          if parsedURL, err := url.Parse(urlStr); err == nil {
-            ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-          }
-        }
+    // Extract extra properties if configured
+    for _, prop := range config.ExtraProperties {
+      if propVal, ok := message[prop.Name]; ok {
+        ctx = context.WithValue(ctx, prop.ContextKey, propVal)
       }
     }
 
@@ -295,9 +282,9 @@ func ForwardTo{{$key}}Client(s *mcpserver.MCPServer, client {{$key}}Client, opts
 
   {{- range $tool_name, $tool_val := $val }}
   {{$tool_name}}Tool := {{$key}}_{{$tool_name}}Tool
-  // Add URL field to schema if ExtractURL is enabled
-  if config.ExtractURL {
-    {{$tool_name}}Tool = runtime.AddURLFieldToTool({{$tool_name}}Tool, config.URLFieldName, config.URLDescription)
+  // Add extra properties to schema if configured
+  if len(config.ExtraProperties) > 0 {
+    {{$tool_name}}Tool = runtime.AddExtraPropertiesToTool({{$tool_name}}Tool, config.ExtraProperties)
   }
   
   s.AddTool({{$tool_name}}Tool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -305,14 +292,10 @@ func ForwardTo{{$key}}Client(s *mcpserver.MCPServer, client {{$key}}Client, opts
 
     message := request.Params.Arguments
 
-    // Extract URL if option is enabled
-    if config.ExtractURL {
-      if urlVal, ok := message[config.URLFieldName]; ok {
-        if urlStr, ok := urlVal.(string); ok {
-          if parsedURL, err := url.Parse(urlStr); err == nil {
-            ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-          }
-        }
+    // Extract extra properties if configured
+    for _, prop := range config.ExtraProperties {
+      if propVal, ok := message[prop.Name]; ok {
+        ctx = context.WithValue(ctx, prop.ContextKey, propVal)
       }
     }
 

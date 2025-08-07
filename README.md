@@ -114,20 +114,26 @@ testdatamcp.ForwardToConnectTestServiceClient(mcpServer, myConnectClient)
 
 This directly connects the MCP handler to the connectrpc client, requiring zero boilerplate.
 
-### URL Override Support
+### Extra properties
 
-All generated MCP functions support dynamic URL overrides via functional options. This allows LLMs to specify custom base URLs for different service environments:
+It's possible to add extra properties to MCP tools, that are not in the proto. These are written into context.
+
 
 ```go
 // Enable URL override with custom field name and description
-option := runtime.WithBaseURLProperty("base_url", "Base URL for the API")
+option := runtime.WithExtraProperties(
+    runtime.ExtraProperty{
+        Name:        "base_url",
+        Description: "Base URL for the API",
+        Required:    true,
+        ContextKey:  MyURLOverrideKey{},
+    },
+)
 
 // Use with any generated function
 testdatamcp.RegisterTestServiceHandler(mcpServer, &srv, option)
 testdatamcp.ForwardToTestServiceClient(mcpServer, client, option)
 ```
-
-When enabled, the tool schema automatically includes the URL field, and LLMs can provide URLs like `https://api.example.com` which get parsed and made available in the request context via `runtime.URLOverrideKey{}`.
 
 ## LLM Provider Compatibility
 

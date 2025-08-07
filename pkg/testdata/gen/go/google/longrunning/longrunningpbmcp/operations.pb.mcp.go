@@ -17,7 +17,6 @@ import (
 	"connectrpc.com/connect"
 	grpc "google.golang.org/grpc"
 	"github.com/redpanda-data/protoc-gen-go-mcp/pkg/runtime"
-	"net/url"
 )
 
 var (
@@ -49,9 +48,9 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer, opt
 		opt(config)
 	}
 	CancelOperationTool := Operations_CancelOperationTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		CancelOperationTool = runtime.AddURLFieldToTool(CancelOperationTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		CancelOperationTool = runtime.AddExtraPropertiesToTool(CancelOperationTool, config.ExtraProperties)
 	}
 
 	s.AddTool(CancelOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -59,14 +58,10 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer, opt
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -92,9 +87,9 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer, opt
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	DeleteOperationTool := Operations_DeleteOperationTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		DeleteOperationTool = runtime.AddURLFieldToTool(DeleteOperationTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		DeleteOperationTool = runtime.AddExtraPropertiesToTool(DeleteOperationTool, config.ExtraProperties)
 	}
 
 	s.AddTool(DeleteOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -102,14 +97,10 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer, opt
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -135,9 +126,9 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer, opt
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	GetOperationTool := Operations_GetOperationTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		GetOperationTool = runtime.AddURLFieldToTool(GetOperationTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		GetOperationTool = runtime.AddExtraPropertiesToTool(GetOperationTool, config.ExtraProperties)
 	}
 
 	s.AddTool(GetOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -145,14 +136,10 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer, opt
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -178,9 +165,9 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer, opt
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	ListOperationsTool := Operations_ListOperationsTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		ListOperationsTool = runtime.AddURLFieldToTool(ListOperationsTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		ListOperationsTool = runtime.AddExtraPropertiesToTool(ListOperationsTool, config.ExtraProperties)
 	}
 
 	s.AddTool(ListOperationsTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -188,14 +175,10 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer, opt
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -221,9 +204,9 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer, opt
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	WaitOperationTool := Operations_WaitOperationTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		WaitOperationTool = runtime.AddURLFieldToTool(WaitOperationTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		WaitOperationTool = runtime.AddExtraPropertiesToTool(WaitOperationTool, config.ExtraProperties)
 	}
 
 	s.AddTool(WaitOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -231,14 +214,10 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer, opt
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -272,9 +251,9 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 		opt(config)
 	}
 	CancelOperationToolOpenAI := Operations_CancelOperationToolOpenAI
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		CancelOperationToolOpenAI = runtime.AddURLFieldToTool(CancelOperationToolOpenAI, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		CancelOperationToolOpenAI = runtime.AddExtraPropertiesToTool(CancelOperationToolOpenAI, config.ExtraProperties)
 	}
 
 	s.AddTool(CancelOperationToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -282,14 +261,10 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -317,9 +292,9 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	DeleteOperationToolOpenAI := Operations_DeleteOperationToolOpenAI
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		DeleteOperationToolOpenAI = runtime.AddURLFieldToTool(DeleteOperationToolOpenAI, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		DeleteOperationToolOpenAI = runtime.AddExtraPropertiesToTool(DeleteOperationToolOpenAI, config.ExtraProperties)
 	}
 
 	s.AddTool(DeleteOperationToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -327,14 +302,10 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -362,9 +333,9 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	GetOperationToolOpenAI := Operations_GetOperationToolOpenAI
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		GetOperationToolOpenAI = runtime.AddURLFieldToTool(GetOperationToolOpenAI, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		GetOperationToolOpenAI = runtime.AddExtraPropertiesToTool(GetOperationToolOpenAI, config.ExtraProperties)
 	}
 
 	s.AddTool(GetOperationToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -372,14 +343,10 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -407,9 +374,9 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	ListOperationsToolOpenAI := Operations_ListOperationsToolOpenAI
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		ListOperationsToolOpenAI = runtime.AddURLFieldToTool(ListOperationsToolOpenAI, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		ListOperationsToolOpenAI = runtime.AddExtraPropertiesToTool(ListOperationsToolOpenAI, config.ExtraProperties)
 	}
 
 	s.AddTool(ListOperationsToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -417,14 +384,10 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -452,9 +415,9 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	WaitOperationToolOpenAI := Operations_WaitOperationToolOpenAI
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		WaitOperationToolOpenAI = runtime.AddURLFieldToTool(WaitOperationToolOpenAI, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		WaitOperationToolOpenAI = runtime.AddExtraPropertiesToTool(WaitOperationToolOpenAI, config.ExtraProperties)
 	}
 
 	s.AddTool(WaitOperationToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -462,14 +425,10 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -535,9 +494,9 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 		opt(config)
 	}
 	CancelOperationTool := Operations_CancelOperationTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		CancelOperationTool = runtime.AddURLFieldToTool(CancelOperationTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		CancelOperationTool = runtime.AddExtraPropertiesToTool(CancelOperationTool, config.ExtraProperties)
 	}
 
 	s.AddTool(CancelOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -545,14 +504,10 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -577,9 +532,9 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	DeleteOperationTool := Operations_DeleteOperationTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		DeleteOperationTool = runtime.AddURLFieldToTool(DeleteOperationTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		DeleteOperationTool = runtime.AddExtraPropertiesToTool(DeleteOperationTool, config.ExtraProperties)
 	}
 
 	s.AddTool(DeleteOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -587,14 +542,10 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -619,9 +570,9 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	GetOperationTool := Operations_GetOperationTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		GetOperationTool = runtime.AddURLFieldToTool(GetOperationTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		GetOperationTool = runtime.AddExtraPropertiesToTool(GetOperationTool, config.ExtraProperties)
 	}
 
 	s.AddTool(GetOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -629,14 +580,10 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -661,9 +608,9 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	ListOperationsTool := Operations_ListOperationsTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		ListOperationsTool = runtime.AddURLFieldToTool(ListOperationsTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		ListOperationsTool = runtime.AddExtraPropertiesToTool(ListOperationsTool, config.ExtraProperties)
 	}
 
 	s.AddTool(ListOperationsTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -671,14 +618,10 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -703,9 +646,9 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	WaitOperationTool := Operations_WaitOperationTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		WaitOperationTool = runtime.AddURLFieldToTool(WaitOperationTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		WaitOperationTool = runtime.AddExtraPropertiesToTool(WaitOperationTool, config.ExtraProperties)
 	}
 
 	s.AddTool(WaitOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -713,14 +656,10 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -753,9 +692,9 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient, 
 		opt(config)
 	}
 	CancelOperationTool := Operations_CancelOperationTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		CancelOperationTool = runtime.AddURLFieldToTool(CancelOperationTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		CancelOperationTool = runtime.AddExtraPropertiesToTool(CancelOperationTool, config.ExtraProperties)
 	}
 
 	s.AddTool(CancelOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -763,14 +702,10 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient, 
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -795,9 +730,9 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient, 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	DeleteOperationTool := Operations_DeleteOperationTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		DeleteOperationTool = runtime.AddURLFieldToTool(DeleteOperationTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		DeleteOperationTool = runtime.AddExtraPropertiesToTool(DeleteOperationTool, config.ExtraProperties)
 	}
 
 	s.AddTool(DeleteOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -805,14 +740,10 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient, 
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -837,9 +768,9 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient, 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	GetOperationTool := Operations_GetOperationTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		GetOperationTool = runtime.AddURLFieldToTool(GetOperationTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		GetOperationTool = runtime.AddExtraPropertiesToTool(GetOperationTool, config.ExtraProperties)
 	}
 
 	s.AddTool(GetOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -847,14 +778,10 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient, 
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -879,9 +806,9 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient, 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	ListOperationsTool := Operations_ListOperationsTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		ListOperationsTool = runtime.AddURLFieldToTool(ListOperationsTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		ListOperationsTool = runtime.AddExtraPropertiesToTool(ListOperationsTool, config.ExtraProperties)
 	}
 
 	s.AddTool(ListOperationsTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -889,14 +816,10 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient, 
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -921,9 +844,9 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient, 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
 	WaitOperationTool := Operations_WaitOperationTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		WaitOperationTool = runtime.AddURLFieldToTool(WaitOperationTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		WaitOperationTool = runtime.AddExtraPropertiesToTool(WaitOperationTool, config.ExtraProperties)
 	}
 
 	s.AddTool(WaitOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -931,14 +854,10 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient, 
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 

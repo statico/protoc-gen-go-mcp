@@ -16,7 +16,6 @@ import (
 	"connectrpc.com/connect"
 	grpc "google.golang.org/grpc"
 	"github.com/redpanda-data/protoc-gen-go-mcp/pkg/runtime"
-	"net/url"
 )
 
 var (
@@ -36,9 +35,9 @@ func RegisterByteStreamHandler(s *mcpserver.MCPServer, srv ByteStreamServer, opt
 		opt(config)
 	}
 	QueryWriteStatusTool := ByteStream_QueryWriteStatusTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		QueryWriteStatusTool = runtime.AddURLFieldToTool(QueryWriteStatusTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		QueryWriteStatusTool = runtime.AddExtraPropertiesToTool(QueryWriteStatusTool, config.ExtraProperties)
 	}
 
 	s.AddTool(QueryWriteStatusTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -46,14 +45,10 @@ func RegisterByteStreamHandler(s *mcpserver.MCPServer, srv ByteStreamServer, opt
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -87,9 +82,9 @@ func RegisterByteStreamHandlerOpenAI(s *mcpserver.MCPServer, srv ByteStreamServe
 		opt(config)
 	}
 	QueryWriteStatusToolOpenAI := ByteStream_QueryWriteStatusToolOpenAI
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		QueryWriteStatusToolOpenAI = runtime.AddURLFieldToTool(QueryWriteStatusToolOpenAI, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		QueryWriteStatusToolOpenAI = runtime.AddExtraPropertiesToTool(QueryWriteStatusToolOpenAI, config.ExtraProperties)
 	}
 
 	s.AddTool(QueryWriteStatusToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -97,14 +92,10 @@ func RegisterByteStreamHandlerOpenAI(s *mcpserver.MCPServer, srv ByteStreamServe
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -162,9 +153,9 @@ func ForwardToConnectByteStreamClient(s *mcpserver.MCPServer, client ConnectByte
 		opt(config)
 	}
 	QueryWriteStatusTool := ByteStream_QueryWriteStatusTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		QueryWriteStatusTool = runtime.AddURLFieldToTool(QueryWriteStatusTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		QueryWriteStatusTool = runtime.AddExtraPropertiesToTool(QueryWriteStatusTool, config.ExtraProperties)
 	}
 
 	s.AddTool(QueryWriteStatusTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -172,14 +163,10 @@ func ForwardToConnectByteStreamClient(s *mcpserver.MCPServer, client ConnectByte
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 
@@ -212,9 +199,9 @@ func ForwardToByteStreamClient(s *mcpserver.MCPServer, client ByteStreamClient, 
 		opt(config)
 	}
 	QueryWriteStatusTool := ByteStream_QueryWriteStatusTool
-	// Add URL field to schema if ExtractURL is enabled
-	if config.ExtractURL {
-		QueryWriteStatusTool = runtime.AddURLFieldToTool(QueryWriteStatusTool, config.URLFieldName, config.URLDescription)
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		QueryWriteStatusTool = runtime.AddExtraPropertiesToTool(QueryWriteStatusTool, config.ExtraProperties)
 	}
 
 	s.AddTool(QueryWriteStatusTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -222,14 +209,10 @@ func ForwardToByteStreamClient(s *mcpserver.MCPServer, client ByteStreamClient, 
 
 		message := request.Params.Arguments
 
-		// Extract URL if option is enabled
-		if config.ExtractURL {
-			if urlVal, ok := message[config.URLFieldName]; ok {
-				if urlStr, ok := urlVal.(string); ok {
-					if parsedURL, err := url.Parse(urlStr); err == nil {
-						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
-					}
-				}
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
 			}
 		}
 

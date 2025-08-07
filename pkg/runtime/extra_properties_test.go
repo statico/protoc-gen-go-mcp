@@ -22,7 +22,12 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestAddURLFieldToTool(t *testing.T) {
+// Test context key types
+type (
+	baseURLKey struct{}
+)
+
+func TestAddExtraPropertiesToTool(t *testing.T) {
 	g := NewWithT(t)
 
 	// Create a test tool with a basic schema
@@ -48,32 +53,54 @@ func TestAddURLFieldToTool(t *testing.T) {
 		RawInputSchema: json.RawMessage(schemaBytes),
 	}
 
-	// Add base_url field to the tool
-	modifiedTool := AddURLFieldToTool(tool, "base_url", "Base URL for the API")
+	// Add extra properties to the tool
+	extraProps := []ExtraProperty{
+		{
+			Name:        "base_url",
+			Description: "Base URL for the API",
+			Required:    true,
+			ContextKey:  baseURLKey{},
+		},
+		{
+			Name:        "api_key",
+			Description: "API key for authentication",
+			Required:    false,
+			ContextKey:  "api_key",
+		},
+	}
+	modifiedTool := AddExtraPropertiesToTool(tool, extraProps)
 
 	// Parse the modified schema
 	var modifiedSchema map[string]interface{}
 	err = json.Unmarshal(modifiedTool.RawInputSchema, &modifiedSchema)
 	g.Expect(err).ToNot(HaveOccurred())
 
-	// Verify the base_url field was added
+	// Verify the properties were added
 	properties := modifiedSchema["properties"].(map[string]interface{})
 	g.Expect(properties).To(HaveKey("base_url"))
+	g.Expect(properties).To(HaveKey("api_key"))
 
+	// Verify base_url field
 	urlField := properties["base_url"].(map[string]interface{})
 	g.Expect(urlField["type"]).To(Equal("string"))
-	g.Expect(urlField["format"]).To(Equal("uri"))
 	g.Expect(urlField["description"]).To(Equal("Base URL for the API"))
+	g.Expect(urlField).ToNot(HaveKey("format")) // No special format handling
+
+	// Verify API key field
+	apiKeyField := properties["api_key"].(map[string]interface{})
+	g.Expect(apiKeyField["type"]).To(Equal("string"))
+	g.Expect(apiKeyField["description"]).To(Equal("API key for authentication"))
+	g.Expect(apiKeyField).ToNot(HaveKey("format"))
 
 	// Verify original fields are still there
 	g.Expect(properties).To(HaveKey("name"))
 	g.Expect(properties).To(HaveKey("age"))
 
-	// Verify the URL field was added to required fields
+	// Verify only required fields were added to required array
 	g.Expect(modifiedSchema["required"]).To(Equal([]interface{}{"name", "base_url"}))
 }
 
-func TestAddURLFieldToToolWithNoProperties(t *testing.T) {
+func TestAddExtraPropertiesToToolWithNoProperties(t *testing.T) {
 	g := NewWithT(t)
 
 	// Create a tool with no properties
@@ -90,8 +117,16 @@ func TestAddURLFieldToToolWithNoProperties(t *testing.T) {
 		RawInputSchema: json.RawMessage(schemaBytes),
 	}
 
-	// Add base_url field to the tool
-	modifiedTool := AddURLFieldToTool(tool, "base_url", "Base URL for the API")
+	// Add extra properties to the tool
+	extraProps := []ExtraProperty{
+		{
+			Name:        "base_url",
+			Description: "Base URL for the API",
+			Required:    true,
+			ContextKey:  baseURLKey{},
+		},
+	}
+	modifiedTool := AddExtraPropertiesToTool(tool, extraProps)
 
 	// Parse the modified schema
 	var modifiedSchema map[string]interface{}
@@ -104,14 +139,14 @@ func TestAddURLFieldToToolWithNoProperties(t *testing.T) {
 
 	urlField := properties["base_url"].(map[string]interface{})
 	g.Expect(urlField["type"]).To(Equal("string"))
-	g.Expect(urlField["format"]).To(Equal("uri"))
 	g.Expect(urlField["description"]).To(Equal("Base URL for the API"))
+	g.Expect(urlField).ToNot(HaveKey("format")) // No special format handling
 
 	// Verify the URL field was added to required fields
 	g.Expect(modifiedSchema["required"]).To(Equal([]interface{}{"base_url"}))
 }
 
-func TestAddURLFieldToToolWithInvalidSchema(t *testing.T) {
+func TestAddExtraPropertiesToToolWithInvalidSchema(t *testing.T) {
 	g := NewWithT(t)
 
 	// Create a tool with invalid JSON schema
@@ -121,14 +156,22 @@ func TestAddURLFieldToToolWithInvalidSchema(t *testing.T) {
 		RawInputSchema: json.RawMessage([]byte("invalid json")),
 	}
 
-	// Add base_url field to the tool - should return original tool due to invalid schema
-	modifiedTool := AddURLFieldToTool(tool, "base_url", "Base URL for the API")
+	// Add extra properties to the tool - should return original tool due to invalid schema
+	extraProps := []ExtraProperty{
+		{
+			Name:        "base_url",
+			Description: "Base URL for the API",
+			Required:    true,
+			ContextKey:  baseURLKey{},
+		},
+	}
+	modifiedTool := AddExtraPropertiesToTool(tool, extraProps)
 
 	// Verify the tool is unchanged
 	g.Expect(modifiedTool).To(Equal(tool))
 }
 
-func TestAddURLFieldToToolWithCustomFieldName(t *testing.T) {
+func TestAddExtraPropertiesToToolWithCustomFieldName(t *testing.T) {
 	g := NewWithT(t)
 
 	// Create a test tool with a basic schema
@@ -152,7 +195,15 @@ func TestAddURLFieldToToolWithCustomFieldName(t *testing.T) {
 	}
 
 	// Add custom field name to the tool
-	modifiedTool := AddURLFieldToTool(tool, "api_url", "Custom API endpoint URL")
+	extraProps := []ExtraProperty{
+		{
+			Name:        "api_url",
+			Description: "Custom API endpoint URL",
+			Required:    true,
+			ContextKey:  baseURLKey{},
+		},
+	}
+	modifiedTool := AddExtraPropertiesToTool(tool, extraProps)
 
 	// Parse the modified schema
 	var modifiedSchema map[string]interface{}
@@ -166,8 +217,8 @@ func TestAddURLFieldToToolWithCustomFieldName(t *testing.T) {
 
 	apiField := properties["api_url"].(map[string]interface{})
 	g.Expect(apiField["type"]).To(Equal("string"))
-	g.Expect(apiField["format"]).To(Equal("uri"))
 	g.Expect(apiField["description"]).To(Equal("Custom API endpoint URL"))
+	g.Expect(apiField).ToNot(HaveKey("format")) // No special format handling
 
 	// Verify original fields are still there
 	g.Expect(properties).To(HaveKey("name"))
