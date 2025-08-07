@@ -114,6 +114,27 @@ testdatamcp.ForwardToConnectTestServiceClient(mcpServer, myConnectClient)
 
 This directly connects the MCP handler to the connectrpc client, requiring zero boilerplate.
 
+### Extra properties
+
+It's possible to add extra properties to MCP tools, that are not in the proto. These are written into context.
+
+
+```go
+// Enable URL override with custom field name and description
+option := runtime.WithExtraProperties(
+    runtime.ExtraProperty{
+        Name:        "base_url",
+        Description: "Base URL for the API",
+        Required:    true,
+        ContextKey:  MyURLOverrideKey{},
+    },
+)
+
+// Use with any generated function
+testdatamcp.RegisterTestServiceHandler(mcpServer, &srv, option)
+testdatamcp.ForwardToTestServiceClient(mcpServer, client, option)
+```
+
 ## LLM Provider Compatibility
 
 The generator now creates both standard MCP and OpenAI-compatible handlers automatically. You can choose which to use at runtime:

@@ -35,11 +35,28 @@ type TestServiceServer interface {
 }
 
 // RegisterTestServiceHandler registers standard MCP handlers for TestService
-func RegisterTestServiceHandler(s *mcpserver.MCPServer, srv TestServiceServer) {
-	s.AddTool(TestService_CreateItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func RegisterTestServiceHandler(s *mcpserver.MCPServer, srv TestServiceServer, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	CreateItemTool := TestService_CreateItemTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		CreateItemTool = runtime.AddExtraPropertiesToTool(CreateItemTool, config.ExtraProperties)
+	}
+
+	s.AddTool(CreateItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.CreateItemRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -62,10 +79,23 @@ func RegisterTestServiceHandler(s *mcpserver.MCPServer, srv TestServiceServer) {
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(TestService_GetItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	GetItemTool := TestService_GetItemTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		GetItemTool = runtime.AddExtraPropertiesToTool(GetItemTool, config.ExtraProperties)
+	}
+
+	s.AddTool(GetItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.GetItemRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -88,10 +118,23 @@ func RegisterTestServiceHandler(s *mcpserver.MCPServer, srv TestServiceServer) {
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(TestService_ProcessWellKnownTypesTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	ProcessWellKnownTypesTool := TestService_ProcessWellKnownTypesTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		ProcessWellKnownTypesTool = runtime.AddExtraPropertiesToTool(ProcessWellKnownTypesTool, config.ExtraProperties)
+	}
+
+	s.AddTool(ProcessWellKnownTypesTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.ProcessWellKnownTypesRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -117,11 +160,29 @@ func RegisterTestServiceHandler(s *mcpserver.MCPServer, srv TestServiceServer) {
 }
 
 // RegisterTestServiceHandlerOpenAI registers OpenAI-compatible MCP handlers for TestService
-func RegisterTestServiceHandlerOpenAI(s *mcpserver.MCPServer, srv TestServiceServer) {
-	s.AddTool(TestService_CreateItemToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func RegisterTestServiceHandlerOpenAI(s *mcpserver.MCPServer, srv TestServiceServer, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	CreateItemToolOpenAI := TestService_CreateItemToolOpenAI
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		CreateItemToolOpenAI = runtime.AddExtraPropertiesToTool(CreateItemToolOpenAI, config.ExtraProperties)
+	}
+
+	s.AddTool(CreateItemToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.CreateItemRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
+
 		runtime.FixOpenAI(req.ProtoReflect().Descriptor(), message)
 
 		marshaled, err := json.Marshal(message)
@@ -145,10 +206,24 @@ func RegisterTestServiceHandlerOpenAI(s *mcpserver.MCPServer, srv TestServiceSer
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(TestService_GetItemToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	GetItemToolOpenAI := TestService_GetItemToolOpenAI
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		GetItemToolOpenAI = runtime.AddExtraPropertiesToTool(GetItemToolOpenAI, config.ExtraProperties)
+	}
+
+	s.AddTool(GetItemToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.GetItemRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
+
 		runtime.FixOpenAI(req.ProtoReflect().Descriptor(), message)
 
 		marshaled, err := json.Marshal(message)
@@ -172,10 +247,24 @@ func RegisterTestServiceHandlerOpenAI(s *mcpserver.MCPServer, srv TestServiceSer
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(TestService_ProcessWellKnownTypesToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	ProcessWellKnownTypesToolOpenAI := TestService_ProcessWellKnownTypesToolOpenAI
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		ProcessWellKnownTypesToolOpenAI = runtime.AddExtraPropertiesToTool(ProcessWellKnownTypesToolOpenAI, config.ExtraProperties)
+	}
+
+	s.AddTool(ProcessWellKnownTypesToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.ProcessWellKnownTypesRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
+
 		runtime.FixOpenAI(req.ProtoReflect().Descriptor(), message)
 
 		marshaled, err := json.Marshal(message)
@@ -202,14 +291,14 @@ func RegisterTestServiceHandlerOpenAI(s *mcpserver.MCPServer, srv TestServiceSer
 }
 
 // RegisterTestServiceHandlerWithProvider registers handlers for the specified LLM provider
-func RegisterTestServiceHandlerWithProvider(s *mcpserver.MCPServer, srv TestServiceServer, provider runtime.LLMProvider) {
+func RegisterTestServiceHandlerWithProvider(s *mcpserver.MCPServer, srv TestServiceServer, provider runtime.LLMProvider, opts ...runtime.Option) {
 	switch provider {
 	case runtime.LLMProviderOpenAI:
-		RegisterTestServiceHandlerOpenAI(s, srv)
+		RegisterTestServiceHandlerOpenAI(s, srv, opts...)
 	case runtime.LLMProviderStandard:
 		fallthrough
 	default:
-		RegisterTestServiceHandler(s, srv)
+		RegisterTestServiceHandler(s, srv, opts...)
 	}
 }
 
@@ -228,11 +317,28 @@ type ConnectTestServiceClient interface {
 }
 
 // ForwardToConnectTestServiceClient registers a connectrpc client, to forward MCP calls to it.
-func ForwardToConnectTestServiceClient(s *mcpserver.MCPServer, client ConnectTestServiceClient) {
-	s.AddTool(TestService_CreateItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func ForwardToConnectTestServiceClient(s *mcpserver.MCPServer, client ConnectTestServiceClient, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	CreateItemTool := TestService_CreateItemTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		CreateItemTool = runtime.AddExtraPropertiesToTool(CreateItemTool, config.ExtraProperties)
+	}
+
+	s.AddTool(CreateItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.CreateItemRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -254,10 +360,23 @@ func ForwardToConnectTestServiceClient(s *mcpserver.MCPServer, client ConnectTes
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(TestService_GetItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	GetItemTool := TestService_GetItemTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		GetItemTool = runtime.AddExtraPropertiesToTool(GetItemTool, config.ExtraProperties)
+	}
+
+	s.AddTool(GetItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.GetItemRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -279,10 +398,23 @@ func ForwardToConnectTestServiceClient(s *mcpserver.MCPServer, client ConnectTes
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(TestService_ProcessWellKnownTypesTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	ProcessWellKnownTypesTool := TestService_ProcessWellKnownTypesTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		ProcessWellKnownTypesTool = runtime.AddExtraPropertiesToTool(ProcessWellKnownTypesTool, config.ExtraProperties)
+	}
+
+	s.AddTool(ProcessWellKnownTypesTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.ProcessWellKnownTypesRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -307,11 +439,28 @@ func ForwardToConnectTestServiceClient(s *mcpserver.MCPServer, client ConnectTes
 }
 
 // ForwardToTestServiceClient registers a gRPC client, to forward MCP calls to it.
-func ForwardToTestServiceClient(s *mcpserver.MCPServer, client TestServiceClient) {
-	s.AddTool(TestService_CreateItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func ForwardToTestServiceClient(s *mcpserver.MCPServer, client TestServiceClient, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	CreateItemTool := TestService_CreateItemTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		CreateItemTool = runtime.AddExtraPropertiesToTool(CreateItemTool, config.ExtraProperties)
+	}
+
+	s.AddTool(CreateItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.CreateItemRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -333,10 +482,23 @@ func ForwardToTestServiceClient(s *mcpserver.MCPServer, client TestServiceClient
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(TestService_GetItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	GetItemTool := TestService_GetItemTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		GetItemTool = runtime.AddExtraPropertiesToTool(GetItemTool, config.ExtraProperties)
+	}
+
+	s.AddTool(GetItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.GetItemRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -358,10 +520,23 @@ func ForwardToTestServiceClient(s *mcpserver.MCPServer, client TestServiceClient
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(TestService_ProcessWellKnownTypesTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	ProcessWellKnownTypesTool := TestService_ProcessWellKnownTypesTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		ProcessWellKnownTypesTool = runtime.AddExtraPropertiesToTool(ProcessWellKnownTypesTool, config.ExtraProperties)
+	}
+
+	s.AddTool(ProcessWellKnownTypesTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.ProcessWellKnownTypesRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {

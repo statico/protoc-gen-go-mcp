@@ -29,11 +29,28 @@ type ByteStreamServer interface {
 }
 
 // RegisterByteStreamHandler registers standard MCP handlers for ByteStream
-func RegisterByteStreamHandler(s *mcpserver.MCPServer, srv ByteStreamServer) {
-	s.AddTool(ByteStream_QueryWriteStatusTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func RegisterByteStreamHandler(s *mcpserver.MCPServer, srv ByteStreamServer, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	QueryWriteStatusTool := ByteStream_QueryWriteStatusTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		QueryWriteStatusTool = runtime.AddExtraPropertiesToTool(QueryWriteStatusTool, config.ExtraProperties)
+	}
+
+	s.AddTool(QueryWriteStatusTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req bytestream.QueryWriteStatusRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -59,11 +76,29 @@ func RegisterByteStreamHandler(s *mcpserver.MCPServer, srv ByteStreamServer) {
 }
 
 // RegisterByteStreamHandlerOpenAI registers OpenAI-compatible MCP handlers for ByteStream
-func RegisterByteStreamHandlerOpenAI(s *mcpserver.MCPServer, srv ByteStreamServer) {
-	s.AddTool(ByteStream_QueryWriteStatusToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func RegisterByteStreamHandlerOpenAI(s *mcpserver.MCPServer, srv ByteStreamServer, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	QueryWriteStatusToolOpenAI := ByteStream_QueryWriteStatusToolOpenAI
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		QueryWriteStatusToolOpenAI = runtime.AddExtraPropertiesToTool(QueryWriteStatusToolOpenAI, config.ExtraProperties)
+	}
+
+	s.AddTool(QueryWriteStatusToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req bytestream.QueryWriteStatusRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
+
 		runtime.FixOpenAI(req.ProtoReflect().Descriptor(), message)
 
 		marshaled, err := json.Marshal(message)
@@ -90,14 +125,14 @@ func RegisterByteStreamHandlerOpenAI(s *mcpserver.MCPServer, srv ByteStreamServe
 }
 
 // RegisterByteStreamHandlerWithProvider registers handlers for the specified LLM provider
-func RegisterByteStreamHandlerWithProvider(s *mcpserver.MCPServer, srv ByteStreamServer, provider runtime.LLMProvider) {
+func RegisterByteStreamHandlerWithProvider(s *mcpserver.MCPServer, srv ByteStreamServer, provider runtime.LLMProvider, opts ...runtime.Option) {
 	switch provider {
 	case runtime.LLMProviderOpenAI:
-		RegisterByteStreamHandlerOpenAI(s, srv)
+		RegisterByteStreamHandlerOpenAI(s, srv, opts...)
 	case runtime.LLMProviderStandard:
 		fallthrough
 	default:
-		RegisterByteStreamHandler(s, srv)
+		RegisterByteStreamHandler(s, srv, opts...)
 	}
 }
 
@@ -112,11 +147,28 @@ type ConnectByteStreamClient interface {
 }
 
 // ForwardToConnectByteStreamClient registers a connectrpc client, to forward MCP calls to it.
-func ForwardToConnectByteStreamClient(s *mcpserver.MCPServer, client ConnectByteStreamClient) {
-	s.AddTool(ByteStream_QueryWriteStatusTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func ForwardToConnectByteStreamClient(s *mcpserver.MCPServer, client ConnectByteStreamClient, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	QueryWriteStatusTool := ByteStream_QueryWriteStatusTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		QueryWriteStatusTool = runtime.AddExtraPropertiesToTool(QueryWriteStatusTool, config.ExtraProperties)
+	}
+
+	s.AddTool(QueryWriteStatusTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req bytestream.QueryWriteStatusRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -141,11 +193,28 @@ func ForwardToConnectByteStreamClient(s *mcpserver.MCPServer, client ConnectByte
 }
 
 // ForwardToByteStreamClient registers a gRPC client, to forward MCP calls to it.
-func ForwardToByteStreamClient(s *mcpserver.MCPServer, client ByteStreamClient) {
-	s.AddTool(ByteStream_QueryWriteStatusTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func ForwardToByteStreamClient(s *mcpserver.MCPServer, client ByteStreamClient, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	QueryWriteStatusTool := ByteStream_QueryWriteStatusTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		QueryWriteStatusTool = runtime.AddExtraPropertiesToTool(QueryWriteStatusTool, config.ExtraProperties)
+	}
+
+	s.AddTool(QueryWriteStatusTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req bytestream.QueryWriteStatusRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {

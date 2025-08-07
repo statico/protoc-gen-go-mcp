@@ -42,11 +42,28 @@ type OperationsServer interface {
 }
 
 // RegisterOperationsHandler registers standard MCP handlers for Operations
-func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer) {
-	s.AddTool(Operations_CancelOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	CancelOperationTool := Operations_CancelOperationTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		CancelOperationTool = runtime.AddExtraPropertiesToTool(CancelOperationTool, config.ExtraProperties)
+	}
+
+	s.AddTool(CancelOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.CancelOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -69,10 +86,23 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer) {
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_DeleteOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	DeleteOperationTool := Operations_DeleteOperationTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		DeleteOperationTool = runtime.AddExtraPropertiesToTool(DeleteOperationTool, config.ExtraProperties)
+	}
+
+	s.AddTool(DeleteOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.DeleteOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -95,10 +125,23 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer) {
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_GetOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	GetOperationTool := Operations_GetOperationTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		GetOperationTool = runtime.AddExtraPropertiesToTool(GetOperationTool, config.ExtraProperties)
+	}
+
+	s.AddTool(GetOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.GetOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -121,10 +164,23 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer) {
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_ListOperationsTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	ListOperationsTool := Operations_ListOperationsTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		ListOperationsTool = runtime.AddExtraPropertiesToTool(ListOperationsTool, config.ExtraProperties)
+	}
+
+	s.AddTool(ListOperationsTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.ListOperationsRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -147,10 +203,23 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer) {
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_WaitOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	WaitOperationTool := Operations_WaitOperationTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		WaitOperationTool = runtime.AddExtraPropertiesToTool(WaitOperationTool, config.ExtraProperties)
+	}
+
+	s.AddTool(WaitOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.WaitOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -176,11 +245,29 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer) {
 }
 
 // RegisterOperationsHandlerOpenAI registers OpenAI-compatible MCP handlers for Operations
-func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServer) {
-	s.AddTool(Operations_CancelOperationToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServer, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	CancelOperationToolOpenAI := Operations_CancelOperationToolOpenAI
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		CancelOperationToolOpenAI = runtime.AddExtraPropertiesToTool(CancelOperationToolOpenAI, config.ExtraProperties)
+	}
+
+	s.AddTool(CancelOperationToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.CancelOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
+
 		runtime.FixOpenAI(req.ProtoReflect().Descriptor(), message)
 
 		marshaled, err := json.Marshal(message)
@@ -204,10 +291,24 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_DeleteOperationToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	DeleteOperationToolOpenAI := Operations_DeleteOperationToolOpenAI
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		DeleteOperationToolOpenAI = runtime.AddExtraPropertiesToTool(DeleteOperationToolOpenAI, config.ExtraProperties)
+	}
+
+	s.AddTool(DeleteOperationToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.DeleteOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
+
 		runtime.FixOpenAI(req.ProtoReflect().Descriptor(), message)
 
 		marshaled, err := json.Marshal(message)
@@ -231,10 +332,24 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_GetOperationToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	GetOperationToolOpenAI := Operations_GetOperationToolOpenAI
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		GetOperationToolOpenAI = runtime.AddExtraPropertiesToTool(GetOperationToolOpenAI, config.ExtraProperties)
+	}
+
+	s.AddTool(GetOperationToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.GetOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
+
 		runtime.FixOpenAI(req.ProtoReflect().Descriptor(), message)
 
 		marshaled, err := json.Marshal(message)
@@ -258,10 +373,24 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_ListOperationsToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	ListOperationsToolOpenAI := Operations_ListOperationsToolOpenAI
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		ListOperationsToolOpenAI = runtime.AddExtraPropertiesToTool(ListOperationsToolOpenAI, config.ExtraProperties)
+	}
+
+	s.AddTool(ListOperationsToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.ListOperationsRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
+
 		runtime.FixOpenAI(req.ProtoReflect().Descriptor(), message)
 
 		marshaled, err := json.Marshal(message)
@@ -285,10 +414,24 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_WaitOperationToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	WaitOperationToolOpenAI := Operations_WaitOperationToolOpenAI
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		WaitOperationToolOpenAI = runtime.AddExtraPropertiesToTool(WaitOperationToolOpenAI, config.ExtraProperties)
+	}
+
+	s.AddTool(WaitOperationToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.WaitOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
+
 		runtime.FixOpenAI(req.ProtoReflect().Descriptor(), message)
 
 		marshaled, err := json.Marshal(message)
@@ -315,14 +458,14 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 }
 
 // RegisterOperationsHandlerWithProvider registers handlers for the specified LLM provider
-func RegisterOperationsHandlerWithProvider(s *mcpserver.MCPServer, srv OperationsServer, provider runtime.LLMProvider) {
+func RegisterOperationsHandlerWithProvider(s *mcpserver.MCPServer, srv OperationsServer, provider runtime.LLMProvider, opts ...runtime.Option) {
 	switch provider {
 	case runtime.LLMProviderOpenAI:
-		RegisterOperationsHandlerOpenAI(s, srv)
+		RegisterOperationsHandlerOpenAI(s, srv, opts...)
 	case runtime.LLMProviderStandard:
 		fallthrough
 	default:
-		RegisterOperationsHandler(s, srv)
+		RegisterOperationsHandler(s, srv, opts...)
 	}
 }
 
@@ -345,11 +488,28 @@ type ConnectOperationsClient interface {
 }
 
 // ForwardToConnectOperationsClient registers a connectrpc client, to forward MCP calls to it.
-func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOperationsClient) {
-	s.AddTool(Operations_CancelOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOperationsClient, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	CancelOperationTool := Operations_CancelOperationTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		CancelOperationTool = runtime.AddExtraPropertiesToTool(CancelOperationTool, config.ExtraProperties)
+	}
+
+	s.AddTool(CancelOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.CancelOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -371,10 +531,23 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_DeleteOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	DeleteOperationTool := Operations_DeleteOperationTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		DeleteOperationTool = runtime.AddExtraPropertiesToTool(DeleteOperationTool, config.ExtraProperties)
+	}
+
+	s.AddTool(DeleteOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.DeleteOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -396,10 +569,23 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_GetOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	GetOperationTool := Operations_GetOperationTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		GetOperationTool = runtime.AddExtraPropertiesToTool(GetOperationTool, config.ExtraProperties)
+	}
+
+	s.AddTool(GetOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.GetOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -421,10 +607,23 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_ListOperationsTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	ListOperationsTool := Operations_ListOperationsTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		ListOperationsTool = runtime.AddExtraPropertiesToTool(ListOperationsTool, config.ExtraProperties)
+	}
+
+	s.AddTool(ListOperationsTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.ListOperationsRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -446,10 +645,23 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_WaitOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	WaitOperationTool := Operations_WaitOperationTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		WaitOperationTool = runtime.AddExtraPropertiesToTool(WaitOperationTool, config.ExtraProperties)
+	}
+
+	s.AddTool(WaitOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.WaitOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -474,11 +686,28 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 }
 
 // ForwardToOperationsClient registers a gRPC client, to forward MCP calls to it.
-func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient) {
-	s.AddTool(Operations_CancelOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	CancelOperationTool := Operations_CancelOperationTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		CancelOperationTool = runtime.AddExtraPropertiesToTool(CancelOperationTool, config.ExtraProperties)
+	}
+
+	s.AddTool(CancelOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.CancelOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -500,10 +729,23 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient) 
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_DeleteOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	DeleteOperationTool := Operations_DeleteOperationTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		DeleteOperationTool = runtime.AddExtraPropertiesToTool(DeleteOperationTool, config.ExtraProperties)
+	}
+
+	s.AddTool(DeleteOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.DeleteOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -525,10 +767,23 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient) 
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_GetOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	GetOperationTool := Operations_GetOperationTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		GetOperationTool = runtime.AddExtraPropertiesToTool(GetOperationTool, config.ExtraProperties)
+	}
+
+	s.AddTool(GetOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.GetOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -550,10 +805,23 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient) 
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_ListOperationsTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	ListOperationsTool := Operations_ListOperationsTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		ListOperationsTool = runtime.AddExtraPropertiesToTool(ListOperationsTool, config.ExtraProperties)
+	}
+
+	s.AddTool(ListOperationsTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.ListOperationsRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -575,10 +843,23 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient) 
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_WaitOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	WaitOperationTool := Operations_WaitOperationTool
+	// Add extra properties to schema if configured
+	if len(config.ExtraProperties) > 0 {
+		WaitOperationTool = runtime.AddExtraPropertiesToTool(WaitOperationTool, config.ExtraProperties)
+	}
+
+	s.AddTool(WaitOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.WaitOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract extra properties if configured
+		for _, prop := range config.ExtraProperties {
+			if propVal, ok := message[prop.Name]; ok {
+				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
