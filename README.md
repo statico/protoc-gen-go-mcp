@@ -114,6 +114,21 @@ testdatamcp.ForwardToConnectTestServiceClient(mcpServer, myConnectClient)
 
 This directly connects the MCP handler to the connectrpc client, requiring zero boilerplate.
 
+### URL Override Support
+
+All generated MCP functions support dynamic URL overrides via functional options. This allows LLMs to specify custom base URLs for different service environments:
+
+```go
+// Enable URL override with custom field name and description
+option := runtime.WithBaseURLProperty("base_url", "Base URL for the API")
+
+// Use with any generated function
+testdatamcp.RegisterTestServiceHandler(mcpServer, &srv, option)
+testdatamcp.ForwardToTestServiceClient(mcpServer, client, option)
+```
+
+When enabled, the tool schema automatically includes the URL field, and LLMs can provide URLs like `https://api.example.com` which get parsed and made available in the request context via `runtime.URLOverrideKey{}`.
+
 ## LLM Provider Compatibility
 
 The generator now creates both standard MCP and OpenAI-compatible handlers automatically. You can choose which to use at runtime:

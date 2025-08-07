@@ -17,6 +17,7 @@ import (
 	"connectrpc.com/connect"
 	grpc "google.golang.org/grpc"
 	"github.com/redpanda-data/protoc-gen-go-mcp/pkg/runtime"
+	"net/url"
 )
 
 var (
@@ -42,11 +43,32 @@ type OperationsServer interface {
 }
 
 // RegisterOperationsHandler registers standard MCP handlers for Operations
-func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer) {
-	s.AddTool(Operations_CancelOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	CancelOperationTool := Operations_CancelOperationTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		CancelOperationTool = runtime.AddURLFieldToTool(CancelOperationTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(CancelOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.CancelOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -69,10 +91,27 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer) {
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_DeleteOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	DeleteOperationTool := Operations_DeleteOperationTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		DeleteOperationTool = runtime.AddURLFieldToTool(DeleteOperationTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(DeleteOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.DeleteOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -95,10 +134,27 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer) {
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_GetOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	GetOperationTool := Operations_GetOperationTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		GetOperationTool = runtime.AddURLFieldToTool(GetOperationTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(GetOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.GetOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -121,10 +177,27 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer) {
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_ListOperationsTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	ListOperationsTool := Operations_ListOperationsTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		ListOperationsTool = runtime.AddURLFieldToTool(ListOperationsTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(ListOperationsTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.ListOperationsRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -147,10 +220,27 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer) {
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_WaitOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	WaitOperationTool := Operations_WaitOperationTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		WaitOperationTool = runtime.AddURLFieldToTool(WaitOperationTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(WaitOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.WaitOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -176,11 +266,33 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer) {
 }
 
 // RegisterOperationsHandlerOpenAI registers OpenAI-compatible MCP handlers for Operations
-func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServer) {
-	s.AddTool(Operations_CancelOperationToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServer, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	CancelOperationToolOpenAI := Operations_CancelOperationToolOpenAI
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		CancelOperationToolOpenAI = runtime.AddURLFieldToTool(CancelOperationToolOpenAI, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(CancelOperationToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.CancelOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
+
 		runtime.FixOpenAI(req.ProtoReflect().Descriptor(), message)
 
 		marshaled, err := json.Marshal(message)
@@ -204,10 +316,28 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_DeleteOperationToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	DeleteOperationToolOpenAI := Operations_DeleteOperationToolOpenAI
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		DeleteOperationToolOpenAI = runtime.AddURLFieldToTool(DeleteOperationToolOpenAI, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(DeleteOperationToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.DeleteOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
+
 		runtime.FixOpenAI(req.ProtoReflect().Descriptor(), message)
 
 		marshaled, err := json.Marshal(message)
@@ -231,10 +361,28 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_GetOperationToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	GetOperationToolOpenAI := Operations_GetOperationToolOpenAI
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		GetOperationToolOpenAI = runtime.AddURLFieldToTool(GetOperationToolOpenAI, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(GetOperationToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.GetOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
+
 		runtime.FixOpenAI(req.ProtoReflect().Descriptor(), message)
 
 		marshaled, err := json.Marshal(message)
@@ -258,10 +406,28 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_ListOperationsToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	ListOperationsToolOpenAI := Operations_ListOperationsToolOpenAI
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		ListOperationsToolOpenAI = runtime.AddURLFieldToTool(ListOperationsToolOpenAI, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(ListOperationsToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.ListOperationsRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
+
 		runtime.FixOpenAI(req.ProtoReflect().Descriptor(), message)
 
 		marshaled, err := json.Marshal(message)
@@ -285,10 +451,28 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_WaitOperationToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	WaitOperationToolOpenAI := Operations_WaitOperationToolOpenAI
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		WaitOperationToolOpenAI = runtime.AddURLFieldToTool(WaitOperationToolOpenAI, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(WaitOperationToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.WaitOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
+
 		runtime.FixOpenAI(req.ProtoReflect().Descriptor(), message)
 
 		marshaled, err := json.Marshal(message)
@@ -315,14 +499,14 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 }
 
 // RegisterOperationsHandlerWithProvider registers handlers for the specified LLM provider
-func RegisterOperationsHandlerWithProvider(s *mcpserver.MCPServer, srv OperationsServer, provider runtime.LLMProvider) {
+func RegisterOperationsHandlerWithProvider(s *mcpserver.MCPServer, srv OperationsServer, provider runtime.LLMProvider, opts ...runtime.Option) {
 	switch provider {
 	case runtime.LLMProviderOpenAI:
-		RegisterOperationsHandlerOpenAI(s, srv)
+		RegisterOperationsHandlerOpenAI(s, srv, opts...)
 	case runtime.LLMProviderStandard:
 		fallthrough
 	default:
-		RegisterOperationsHandler(s, srv)
+		RegisterOperationsHandler(s, srv, opts...)
 	}
 }
 
@@ -345,11 +529,32 @@ type ConnectOperationsClient interface {
 }
 
 // ForwardToConnectOperationsClient registers a connectrpc client, to forward MCP calls to it.
-func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOperationsClient) {
-	s.AddTool(Operations_CancelOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOperationsClient, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	CancelOperationTool := Operations_CancelOperationTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		CancelOperationTool = runtime.AddURLFieldToTool(CancelOperationTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(CancelOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.CancelOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -371,10 +576,27 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_DeleteOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	DeleteOperationTool := Operations_DeleteOperationTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		DeleteOperationTool = runtime.AddURLFieldToTool(DeleteOperationTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(DeleteOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.DeleteOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -396,10 +618,27 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_GetOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	GetOperationTool := Operations_GetOperationTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		GetOperationTool = runtime.AddURLFieldToTool(GetOperationTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(GetOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.GetOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -421,10 +660,27 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_ListOperationsTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	ListOperationsTool := Operations_ListOperationsTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		ListOperationsTool = runtime.AddURLFieldToTool(ListOperationsTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(ListOperationsTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.ListOperationsRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -446,10 +702,27 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_WaitOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	WaitOperationTool := Operations_WaitOperationTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		WaitOperationTool = runtime.AddURLFieldToTool(WaitOperationTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(WaitOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.WaitOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -474,11 +747,32 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 }
 
 // ForwardToOperationsClient registers a gRPC client, to forward MCP calls to it.
-func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient) {
-	s.AddTool(Operations_CancelOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	CancelOperationTool := Operations_CancelOperationTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		CancelOperationTool = runtime.AddURLFieldToTool(CancelOperationTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(CancelOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.CancelOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -500,10 +794,27 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient) 
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_DeleteOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	DeleteOperationTool := Operations_DeleteOperationTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		DeleteOperationTool = runtime.AddURLFieldToTool(DeleteOperationTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(DeleteOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.DeleteOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -525,10 +836,27 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient) 
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_GetOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	GetOperationTool := Operations_GetOperationTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		GetOperationTool = runtime.AddURLFieldToTool(GetOperationTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(GetOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.GetOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -550,10 +878,27 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient) 
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_ListOperationsTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	ListOperationsTool := Operations_ListOperationsTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		ListOperationsTool = runtime.AddURLFieldToTool(ListOperationsTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(ListOperationsTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.ListOperationsRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -575,10 +920,27 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient) 
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(Operations_WaitOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	WaitOperationTool := Operations_WaitOperationTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		WaitOperationTool = runtime.AddURLFieldToTool(WaitOperationTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(WaitOperationTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req longrunningpb.WaitOperationRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {

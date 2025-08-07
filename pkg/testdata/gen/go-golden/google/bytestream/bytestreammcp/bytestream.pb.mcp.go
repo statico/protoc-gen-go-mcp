@@ -16,6 +16,7 @@ import (
 	"connectrpc.com/connect"
 	grpc "google.golang.org/grpc"
 	"github.com/redpanda-data/protoc-gen-go-mcp/pkg/runtime"
+	"net/url"
 )
 
 var (
@@ -29,11 +30,32 @@ type ByteStreamServer interface {
 }
 
 // RegisterByteStreamHandler registers standard MCP handlers for ByteStream
-func RegisterByteStreamHandler(s *mcpserver.MCPServer, srv ByteStreamServer) {
-	s.AddTool(ByteStream_QueryWriteStatusTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func RegisterByteStreamHandler(s *mcpserver.MCPServer, srv ByteStreamServer, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	QueryWriteStatusTool := ByteStream_QueryWriteStatusTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		QueryWriteStatusTool = runtime.AddURLFieldToTool(QueryWriteStatusTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(QueryWriteStatusTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req bytestream.QueryWriteStatusRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -59,11 +81,33 @@ func RegisterByteStreamHandler(s *mcpserver.MCPServer, srv ByteStreamServer) {
 }
 
 // RegisterByteStreamHandlerOpenAI registers OpenAI-compatible MCP handlers for ByteStream
-func RegisterByteStreamHandlerOpenAI(s *mcpserver.MCPServer, srv ByteStreamServer) {
-	s.AddTool(ByteStream_QueryWriteStatusToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func RegisterByteStreamHandlerOpenAI(s *mcpserver.MCPServer, srv ByteStreamServer, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	QueryWriteStatusToolOpenAI := ByteStream_QueryWriteStatusToolOpenAI
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		QueryWriteStatusToolOpenAI = runtime.AddURLFieldToTool(QueryWriteStatusToolOpenAI, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(QueryWriteStatusToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req bytestream.QueryWriteStatusRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
+
 		runtime.FixOpenAI(req.ProtoReflect().Descriptor(), message)
 
 		marshaled, err := json.Marshal(message)
@@ -90,14 +134,14 @@ func RegisterByteStreamHandlerOpenAI(s *mcpserver.MCPServer, srv ByteStreamServe
 }
 
 // RegisterByteStreamHandlerWithProvider registers handlers for the specified LLM provider
-func RegisterByteStreamHandlerWithProvider(s *mcpserver.MCPServer, srv ByteStreamServer, provider runtime.LLMProvider) {
+func RegisterByteStreamHandlerWithProvider(s *mcpserver.MCPServer, srv ByteStreamServer, provider runtime.LLMProvider, opts ...runtime.Option) {
 	switch provider {
 	case runtime.LLMProviderOpenAI:
-		RegisterByteStreamHandlerOpenAI(s, srv)
+		RegisterByteStreamHandlerOpenAI(s, srv, opts...)
 	case runtime.LLMProviderStandard:
 		fallthrough
 	default:
-		RegisterByteStreamHandler(s, srv)
+		RegisterByteStreamHandler(s, srv, opts...)
 	}
 }
 
@@ -112,11 +156,32 @@ type ConnectByteStreamClient interface {
 }
 
 // ForwardToConnectByteStreamClient registers a connectrpc client, to forward MCP calls to it.
-func ForwardToConnectByteStreamClient(s *mcpserver.MCPServer, client ConnectByteStreamClient) {
-	s.AddTool(ByteStream_QueryWriteStatusTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func ForwardToConnectByteStreamClient(s *mcpserver.MCPServer, client ConnectByteStreamClient, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	QueryWriteStatusTool := ByteStream_QueryWriteStatusTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		QueryWriteStatusTool = runtime.AddURLFieldToTool(QueryWriteStatusTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(QueryWriteStatusTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req bytestream.QueryWriteStatusRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -141,11 +206,32 @@ func ForwardToConnectByteStreamClient(s *mcpserver.MCPServer, client ConnectByte
 }
 
 // ForwardToByteStreamClient registers a gRPC client, to forward MCP calls to it.
-func ForwardToByteStreamClient(s *mcpserver.MCPServer, client ByteStreamClient) {
-	s.AddTool(ByteStream_QueryWriteStatusTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func ForwardToByteStreamClient(s *mcpserver.MCPServer, client ByteStreamClient, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	QueryWriteStatusTool := ByteStream_QueryWriteStatusTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		QueryWriteStatusTool = runtime.AddURLFieldToTool(QueryWriteStatusTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(QueryWriteStatusTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req bytestream.QueryWriteStatusRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {

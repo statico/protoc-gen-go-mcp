@@ -65,6 +65,7 @@ import (
   "connectrpc.com/connect"
   grpc "google.golang.org/grpc"
   "github.com/redpanda-data/protoc-gen-go-mcp/pkg/runtime"
+  "net/url"
 )
 
 
@@ -88,12 +89,34 @@ type {{$serviceName}}Server interface {
 
 {{- range $key, $val := .Services }}
 // Register{{$key}}Handler registers standard MCP handlers for {{$key}}
-func Register{{$key}}Handler(s *mcpserver.MCPServer, srv {{$key}}Server) {
+func Register{{$key}}Handler(s *mcpserver.MCPServer, srv {{$key}}Server, opts ...runtime.Option) {
+  config := runtime.NewConfig()
+  for _, opt := range opts {
+    opt(config)
+  }
+
   {{- range $tool_name, $tool_val := $val }}
-  s.AddTool({{$key}}_{{$tool_name}}Tool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+  {{$tool_name}}Tool := {{$key}}_{{$tool_name}}Tool
+  // Add URL field to schema if ExtractURL is enabled
+  if config.ExtractURL {
+    {{$tool_name}}Tool = runtime.AddURLFieldToTool({{$tool_name}}Tool, config.URLFieldName, config.URLDescription)
+  }
+  
+  s.AddTool({{$tool_name}}Tool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
     var req {{$tool_val.RequestType}}
 
     message := request.Params.Arguments
+
+    // Extract URL if option is enabled
+    if config.ExtractURL {
+      if urlVal, ok := message[config.URLFieldName]; ok {
+        if urlStr, ok := urlVal.(string); ok {
+          if parsedURL, err := url.Parse(urlStr); err == nil {
+            ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+          }
+        }
+      }
+    }
 
     marshaled, err := json.Marshal(message)
     if err != nil {
@@ -120,12 +143,35 @@ func Register{{$key}}Handler(s *mcpserver.MCPServer, srv {{$key}}Server) {
 }
 
 // Register{{$key}}HandlerOpenAI registers OpenAI-compatible MCP handlers for {{$key}}
-func Register{{$key}}HandlerOpenAI(s *mcpserver.MCPServer, srv {{$key}}Server) {
+func Register{{$key}}HandlerOpenAI(s *mcpserver.MCPServer, srv {{$key}}Server, opts ...runtime.Option) {
+  config := runtime.NewConfig()
+  for _, opt := range opts {
+    opt(config)
+  }
+
   {{- range $tool_name, $tool_val := $val }}
-  s.AddTool({{$key}}_{{$tool_name}}ToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+  {{$tool_name}}ToolOpenAI := {{$key}}_{{$tool_name}}ToolOpenAI
+  // Add URL field to schema if ExtractURL is enabled
+  if config.ExtractURL {
+    {{$tool_name}}ToolOpenAI = runtime.AddURLFieldToTool({{$tool_name}}ToolOpenAI, config.URLFieldName, config.URLDescription)
+  }
+  
+  s.AddTool({{$tool_name}}ToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
     var req {{$tool_val.RequestType}}
 
     message := request.Params.Arguments
+
+    // Extract URL if option is enabled
+    if config.ExtractURL {
+      if urlVal, ok := message[config.URLFieldName]; ok {
+        if urlStr, ok := urlVal.(string); ok {
+          if parsedURL, err := url.Parse(urlStr); err == nil {
+            ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+          }
+        }
+      }
+    }
+
     runtime.FixOpenAI(req.ProtoReflect().Descriptor(), message)
 
     marshaled, err := json.Marshal(message)
@@ -153,14 +199,14 @@ func Register{{$key}}HandlerOpenAI(s *mcpserver.MCPServer, srv {{$key}}Server) {
 }
 
 // Register{{$key}}HandlerWithProvider registers handlers for the specified LLM provider
-func Register{{$key}}HandlerWithProvider(s *mcpserver.MCPServer, srv {{$key}}Server, provider runtime.LLMProvider) {
+func Register{{$key}}HandlerWithProvider(s *mcpserver.MCPServer, srv {{$key}}Server, provider runtime.LLMProvider, opts ...runtime.Option) {
   switch provider {
   case runtime.LLMProviderOpenAI:
-    Register{{$key}}HandlerOpenAI(s, srv)
+    Register{{$key}}HandlerOpenAI(s, srv, opts...)
   case runtime.LLMProviderStandard:
     fallthrough
   default:
-    Register{{$key}}Handler(s, srv)
+    Register{{$key}}Handler(s, srv, opts...)
   }
 }
 {{- end }}
@@ -186,12 +232,34 @@ type Connect{{$serviceName}}Client interface {
 
 {{- range $key, $val := .Services }}
 // ForwardToConnect{{$key}}Client registers a connectrpc client, to forward MCP calls to it.
-func ForwardToConnect{{$key}}Client(s *mcpserver.MCPServer, client Connect{{$key}}Client) {
+func ForwardToConnect{{$key}}Client(s *mcpserver.MCPServer, client Connect{{$key}}Client, opts ...runtime.Option) {
+  config := runtime.NewConfig()
+  for _, opt := range opts {
+    opt(config)
+  }
+
   {{- range $tool_name, $tool_val := $val }}
-  s.AddTool({{$key}}_{{$tool_name}}Tool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+  {{$tool_name}}Tool := {{$key}}_{{$tool_name}}Tool
+  // Add URL field to schema if ExtractURL is enabled
+  if config.ExtractURL {
+    {{$tool_name}}Tool = runtime.AddURLFieldToTool({{$tool_name}}Tool, config.URLFieldName, config.URLDescription)
+  }
+  
+  s.AddTool({{$tool_name}}Tool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
     var req {{$tool_val.RequestType}}
 
     message := request.Params.Arguments
+
+    // Extract URL if option is enabled
+    if config.ExtractURL {
+      if urlVal, ok := message[config.URLFieldName]; ok {
+        if urlStr, ok := urlVal.(string); ok {
+          if parsedURL, err := url.Parse(urlStr); err == nil {
+            ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+          }
+        }
+      }
+    }
 
     marshaled, err := json.Marshal(message)
     if err != nil {
@@ -219,12 +287,34 @@ func ForwardToConnect{{$key}}Client(s *mcpserver.MCPServer, client Connect{{$key
 
 {{- range $key, $val := .Services }}
 // ForwardTo{{$key}}Client registers a gRPC client, to forward MCP calls to it.
-func ForwardTo{{$key}}Client(s *mcpserver.MCPServer, client {{$key}}Client) {
+func ForwardTo{{$key}}Client(s *mcpserver.MCPServer, client {{$key}}Client, opts ...runtime.Option) {
+  config := runtime.NewConfig()
+  for _, opt := range opts {
+    opt(config)
+  }
+
   {{- range $tool_name, $tool_val := $val }}
-  s.AddTool({{$key}}_{{$tool_name}}Tool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+  {{$tool_name}}Tool := {{$key}}_{{$tool_name}}Tool
+  // Add URL field to schema if ExtractURL is enabled
+  if config.ExtractURL {
+    {{$tool_name}}Tool = runtime.AddURLFieldToTool({{$tool_name}}Tool, config.URLFieldName, config.URLDescription)
+  }
+  
+  s.AddTool({{$tool_name}}Tool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
     var req {{$tool_val.RequestType}}
 
     message := request.Params.Arguments
+
+    // Extract URL if option is enabled
+    if config.ExtractURL {
+      if urlVal, ok := message[config.URLFieldName]; ok {
+        if urlStr, ok := urlVal.(string); ok {
+          if parsedURL, err := url.Parse(urlStr); err == nil {
+            ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+          }
+        }
+      }
+    }
 
     marshaled, err := json.Marshal(message)
     if err != nil {

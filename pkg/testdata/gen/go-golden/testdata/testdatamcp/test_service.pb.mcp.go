@@ -16,6 +16,7 @@ import (
 	"connectrpc.com/connect"
 	grpc "google.golang.org/grpc"
 	"github.com/redpanda-data/protoc-gen-go-mcp/pkg/runtime"
+	"net/url"
 )
 
 var (
@@ -35,11 +36,32 @@ type TestServiceServer interface {
 }
 
 // RegisterTestServiceHandler registers standard MCP handlers for TestService
-func RegisterTestServiceHandler(s *mcpserver.MCPServer, srv TestServiceServer) {
-	s.AddTool(TestService_CreateItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func RegisterTestServiceHandler(s *mcpserver.MCPServer, srv TestServiceServer, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	CreateItemTool := TestService_CreateItemTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		CreateItemTool = runtime.AddURLFieldToTool(CreateItemTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(CreateItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.CreateItemRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -62,10 +84,27 @@ func RegisterTestServiceHandler(s *mcpserver.MCPServer, srv TestServiceServer) {
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(TestService_GetItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	GetItemTool := TestService_GetItemTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		GetItemTool = runtime.AddURLFieldToTool(GetItemTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(GetItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.GetItemRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -88,10 +127,27 @@ func RegisterTestServiceHandler(s *mcpserver.MCPServer, srv TestServiceServer) {
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(TestService_ProcessWellKnownTypesTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	ProcessWellKnownTypesTool := TestService_ProcessWellKnownTypesTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		ProcessWellKnownTypesTool = runtime.AddURLFieldToTool(ProcessWellKnownTypesTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(ProcessWellKnownTypesTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.ProcessWellKnownTypesRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -117,11 +173,33 @@ func RegisterTestServiceHandler(s *mcpserver.MCPServer, srv TestServiceServer) {
 }
 
 // RegisterTestServiceHandlerOpenAI registers OpenAI-compatible MCP handlers for TestService
-func RegisterTestServiceHandlerOpenAI(s *mcpserver.MCPServer, srv TestServiceServer) {
-	s.AddTool(TestService_CreateItemToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func RegisterTestServiceHandlerOpenAI(s *mcpserver.MCPServer, srv TestServiceServer, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	CreateItemToolOpenAI := TestService_CreateItemToolOpenAI
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		CreateItemToolOpenAI = runtime.AddURLFieldToTool(CreateItemToolOpenAI, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(CreateItemToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.CreateItemRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
+
 		runtime.FixOpenAI(req.ProtoReflect().Descriptor(), message)
 
 		marshaled, err := json.Marshal(message)
@@ -145,10 +223,28 @@ func RegisterTestServiceHandlerOpenAI(s *mcpserver.MCPServer, srv TestServiceSer
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(TestService_GetItemToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	GetItemToolOpenAI := TestService_GetItemToolOpenAI
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		GetItemToolOpenAI = runtime.AddURLFieldToTool(GetItemToolOpenAI, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(GetItemToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.GetItemRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
+
 		runtime.FixOpenAI(req.ProtoReflect().Descriptor(), message)
 
 		marshaled, err := json.Marshal(message)
@@ -172,10 +268,28 @@ func RegisterTestServiceHandlerOpenAI(s *mcpserver.MCPServer, srv TestServiceSer
 
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(TestService_ProcessWellKnownTypesToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	ProcessWellKnownTypesToolOpenAI := TestService_ProcessWellKnownTypesToolOpenAI
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		ProcessWellKnownTypesToolOpenAI = runtime.AddURLFieldToTool(ProcessWellKnownTypesToolOpenAI, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(ProcessWellKnownTypesToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.ProcessWellKnownTypesRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
+
 		runtime.FixOpenAI(req.ProtoReflect().Descriptor(), message)
 
 		marshaled, err := json.Marshal(message)
@@ -202,14 +316,14 @@ func RegisterTestServiceHandlerOpenAI(s *mcpserver.MCPServer, srv TestServiceSer
 }
 
 // RegisterTestServiceHandlerWithProvider registers handlers for the specified LLM provider
-func RegisterTestServiceHandlerWithProvider(s *mcpserver.MCPServer, srv TestServiceServer, provider runtime.LLMProvider) {
+func RegisterTestServiceHandlerWithProvider(s *mcpserver.MCPServer, srv TestServiceServer, provider runtime.LLMProvider, opts ...runtime.Option) {
 	switch provider {
 	case runtime.LLMProviderOpenAI:
-		RegisterTestServiceHandlerOpenAI(s, srv)
+		RegisterTestServiceHandlerOpenAI(s, srv, opts...)
 	case runtime.LLMProviderStandard:
 		fallthrough
 	default:
-		RegisterTestServiceHandler(s, srv)
+		RegisterTestServiceHandler(s, srv, opts...)
 	}
 }
 
@@ -228,11 +342,32 @@ type ConnectTestServiceClient interface {
 }
 
 // ForwardToConnectTestServiceClient registers a connectrpc client, to forward MCP calls to it.
-func ForwardToConnectTestServiceClient(s *mcpserver.MCPServer, client ConnectTestServiceClient) {
-	s.AddTool(TestService_CreateItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func ForwardToConnectTestServiceClient(s *mcpserver.MCPServer, client ConnectTestServiceClient, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	CreateItemTool := TestService_CreateItemTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		CreateItemTool = runtime.AddURLFieldToTool(CreateItemTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(CreateItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.CreateItemRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -254,10 +389,27 @@ func ForwardToConnectTestServiceClient(s *mcpserver.MCPServer, client ConnectTes
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(TestService_GetItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	GetItemTool := TestService_GetItemTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		GetItemTool = runtime.AddURLFieldToTool(GetItemTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(GetItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.GetItemRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -279,10 +431,27 @@ func ForwardToConnectTestServiceClient(s *mcpserver.MCPServer, client ConnectTes
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(TestService_ProcessWellKnownTypesTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	ProcessWellKnownTypesTool := TestService_ProcessWellKnownTypesTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		ProcessWellKnownTypesTool = runtime.AddURLFieldToTool(ProcessWellKnownTypesTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(ProcessWellKnownTypesTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.ProcessWellKnownTypesRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -307,11 +476,32 @@ func ForwardToConnectTestServiceClient(s *mcpserver.MCPServer, client ConnectTes
 }
 
 // ForwardToTestServiceClient registers a gRPC client, to forward MCP calls to it.
-func ForwardToTestServiceClient(s *mcpserver.MCPServer, client TestServiceClient) {
-	s.AddTool(TestService_CreateItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func ForwardToTestServiceClient(s *mcpserver.MCPServer, client TestServiceClient, opts ...runtime.Option) {
+	config := runtime.NewConfig()
+	for _, opt := range opts {
+		opt(config)
+	}
+	CreateItemTool := TestService_CreateItemTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		CreateItemTool = runtime.AddURLFieldToTool(CreateItemTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(CreateItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.CreateItemRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -333,10 +523,27 @@ func ForwardToTestServiceClient(s *mcpserver.MCPServer, client TestServiceClient
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(TestService_GetItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	GetItemTool := TestService_GetItemTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		GetItemTool = runtime.AddURLFieldToTool(GetItemTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(GetItemTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.GetItemRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
@@ -358,10 +565,27 @@ func ForwardToTestServiceClient(s *mcpserver.MCPServer, client TestServiceClient
 		}
 		return mcp.NewToolResultText(string(marshaled)), nil
 	})
-	s.AddTool(TestService_ProcessWellKnownTypesTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	ProcessWellKnownTypesTool := TestService_ProcessWellKnownTypesTool
+	// Add URL field to schema if ExtractURL is enabled
+	if config.ExtractURL {
+		ProcessWellKnownTypesTool = runtime.AddURLFieldToTool(ProcessWellKnownTypesTool, config.URLFieldName, config.URLDescription)
+	}
+
+	s.AddTool(ProcessWellKnownTypesTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		var req testdata.ProcessWellKnownTypesRequest
 
 		message := request.Params.Arguments
+
+		// Extract URL if option is enabled
+		if config.ExtractURL {
+			if urlVal, ok := message[config.URLFieldName]; ok {
+				if urlStr, ok := urlVal.(string); ok {
+					if parsedURL, err := url.Parse(urlStr); err == nil {
+						ctx = context.WithValue(ctx, runtime.URLOverrideKey{}, parsedURL)
+					}
+				}
+			}
+		}
 
 		marshaled, err := json.Marshal(message)
 		if err != nil {
