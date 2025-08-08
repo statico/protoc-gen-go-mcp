@@ -76,7 +76,7 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer, opt
 
 		resp, err := srv.CancelOperation(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -115,7 +115,7 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer, opt
 
 		resp, err := srv.DeleteOperation(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -154,7 +154,7 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer, opt
 
 		resp, err := srv.GetOperation(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -193,7 +193,7 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer, opt
 
 		resp, err := srv.ListOperations(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -232,7 +232,7 @@ func RegisterOperationsHandler(s *mcpserver.MCPServer, srv OperationsServer, opt
 
 		resp, err := srv.WaitOperation(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -281,7 +281,7 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 
 		resp, err := srv.CancelOperation(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -322,7 +322,7 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 
 		resp, err := srv.DeleteOperation(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -363,7 +363,7 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 
 		resp, err := srv.GetOperation(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -404,7 +404,7 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 
 		resp, err := srv.ListOperations(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -445,7 +445,7 @@ func RegisterOperationsHandlerOpenAI(s *mcpserver.MCPServer, srv OperationsServe
 
 		resp, err := srv.WaitOperation(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -522,7 +522,7 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 
 		resp, err := client.CancelOperation(ctx, connect.NewRequest(&req))
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp.Msg)
@@ -560,7 +560,7 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 
 		resp, err := client.DeleteOperation(ctx, connect.NewRequest(&req))
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp.Msg)
@@ -598,7 +598,7 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 
 		resp, err := client.GetOperation(ctx, connect.NewRequest(&req))
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp.Msg)
@@ -636,7 +636,7 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 
 		resp, err := client.ListOperations(ctx, connect.NewRequest(&req))
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp.Msg)
@@ -674,7 +674,7 @@ func ForwardToConnectOperationsClient(s *mcpserver.MCPServer, client ConnectOper
 
 		resp, err := client.WaitOperation(ctx, connect.NewRequest(&req))
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp.Msg)
@@ -720,7 +720,7 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient, 
 
 		resp, err := client.CancelOperation(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -758,7 +758,7 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient, 
 
 		resp, err := client.DeleteOperation(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -796,7 +796,7 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient, 
 
 		resp, err := client.GetOperation(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -834,7 +834,7 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient, 
 
 		resp, err := client.ListOperations(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -872,7 +872,7 @@ func ForwardToOperationsClient(s *mcpserver.MCPServer, client OperationsClient, 
 
 		resp, err := client.WaitOperation(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)

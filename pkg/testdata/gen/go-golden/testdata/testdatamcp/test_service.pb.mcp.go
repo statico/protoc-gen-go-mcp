@@ -69,7 +69,7 @@ func RegisterTestServiceHandler(s *mcpserver.MCPServer, srv TestServiceServer, o
 
 		resp, err := srv.CreateItem(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -108,7 +108,7 @@ func RegisterTestServiceHandler(s *mcpserver.MCPServer, srv TestServiceServer, o
 
 		resp, err := srv.GetItem(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -147,7 +147,7 @@ func RegisterTestServiceHandler(s *mcpserver.MCPServer, srv TestServiceServer, o
 
 		resp, err := srv.ProcessWellKnownTypes(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -196,7 +196,7 @@ func RegisterTestServiceHandlerOpenAI(s *mcpserver.MCPServer, srv TestServiceSer
 
 		resp, err := srv.CreateItem(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -237,7 +237,7 @@ func RegisterTestServiceHandlerOpenAI(s *mcpserver.MCPServer, srv TestServiceSer
 
 		resp, err := srv.GetItem(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -278,7 +278,7 @@ func RegisterTestServiceHandlerOpenAI(s *mcpserver.MCPServer, srv TestServiceSer
 
 		resp, err := srv.ProcessWellKnownTypes(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -351,7 +351,7 @@ func ForwardToConnectTestServiceClient(s *mcpserver.MCPServer, client ConnectTes
 
 		resp, err := client.CreateItem(ctx, connect.NewRequest(&req))
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp.Msg)
@@ -389,7 +389,7 @@ func ForwardToConnectTestServiceClient(s *mcpserver.MCPServer, client ConnectTes
 
 		resp, err := client.GetItem(ctx, connect.NewRequest(&req))
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp.Msg)
@@ -427,7 +427,7 @@ func ForwardToConnectTestServiceClient(s *mcpserver.MCPServer, client ConnectTes
 
 		resp, err := client.ProcessWellKnownTypes(ctx, connect.NewRequest(&req))
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp.Msg)
@@ -473,7 +473,7 @@ func ForwardToTestServiceClient(s *mcpserver.MCPServer, client TestServiceClient
 
 		resp, err := client.CreateItem(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -511,7 +511,7 @@ func ForwardToTestServiceClient(s *mcpserver.MCPServer, client TestServiceClient
 
 		resp, err := client.GetItem(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -549,7 +549,7 @@ func ForwardToTestServiceClient(s *mcpserver.MCPServer, client TestServiceClient
 
 		resp, err := client.ProcessWellKnownTypes(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)

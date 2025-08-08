@@ -63,7 +63,7 @@ func RegisterByteStreamHandler(s *mcpserver.MCPServer, srv ByteStreamServer, opt
 
 		resp, err := srv.QueryWriteStatus(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -112,7 +112,7 @@ func RegisterByteStreamHandlerOpenAI(s *mcpserver.MCPServer, srv ByteStreamServe
 
 		resp, err := srv.QueryWriteStatus(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -181,7 +181,7 @@ func ForwardToConnectByteStreamClient(s *mcpserver.MCPServer, client ConnectByte
 
 		resp, err := client.QueryWriteStatus(ctx, connect.NewRequest(&req))
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp.Msg)
@@ -227,7 +227,7 @@ func ForwardToByteStreamClient(s *mcpserver.MCPServer, client ByteStreamClient, 
 
 		resp, err := client.QueryWriteStatus(ctx, &req)
 		if err != nil {
-			return nil, err
+			return runtime.HandleError(err)
 		}
 
 		marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
