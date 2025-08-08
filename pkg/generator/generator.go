@@ -124,7 +124,7 @@ func Register{{$key}}Handler(s *mcpserver.MCPServer, srv {{$key}}Server, opts ..
 
     resp, err := srv.{{$tool_name}}(ctx, &req)
     if err != nil {
-      return nil, err
+      return runtime.HandleError(err)
     }
 
     marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -176,7 +176,7 @@ func Register{{$key}}HandlerOpenAI(s *mcpserver.MCPServer, srv {{$key}}Server, o
 
     resp, err := srv.{{$tool_name}}(ctx, &req)
     if err != nil {
-      return nil, err
+      return runtime.HandleError(err)
     }
 
     marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
@@ -259,7 +259,7 @@ func ForwardToConnect{{$key}}Client(s *mcpserver.MCPServer, client Connect{{$key
 
     resp, err := client.{{$tool_name}}(ctx, connect.NewRequest(&req))
     if err != nil {
-      return nil, err
+      return runtime.HandleError(err)
     }
 
     marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp.Msg)
@@ -310,7 +310,7 @@ func ForwardTo{{$key}}Client(s *mcpserver.MCPServer, client {{$key}}Client, opts
 
     resp, err := client.{{$tool_name}}(ctx, &req)
     if err != nil {
-      return nil, err
+      return runtime.HandleError(err)
     }
 
     marshaled, err = (protojson.MarshalOptions{UseProtoNames: true, EmitDefaultValues: true}).Marshal(resp)
