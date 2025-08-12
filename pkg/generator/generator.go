@@ -104,7 +104,7 @@ func Register{{$key}}Handler(s *mcpserver.MCPServer, srv {{$key}}Server, opts ..
   s.AddTool({{$tool_name}}Tool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
     var req {{$tool_val.RequestType}}
 
-    message := request.Params.Arguments
+    message := request.GetArguments()
 
     // Extract extra properties if configured
     for _, prop := range config.ExtraProperties {
@@ -154,7 +154,7 @@ func Register{{$key}}HandlerOpenAI(s *mcpserver.MCPServer, srv {{$key}}Server, o
   s.AddTool({{$tool_name}}ToolOpenAI, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
     var req {{$tool_val.RequestType}}
 
-    message := request.Params.Arguments
+    message := request.GetArguments()
 
     // Extract extra properties if configured
     for _, prop := range config.ExtraProperties {
@@ -239,7 +239,7 @@ func ForwardToConnect{{$key}}Client(s *mcpserver.MCPServer, client Connect{{$key
   s.AddTool({{$tool_name}}Tool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
     var req {{$tool_val.RequestType}}
 
-    message := request.Params.Arguments
+    message := request.GetArguments()
 
     // Extract extra properties if configured
     for _, prop := range config.ExtraProperties {
@@ -290,7 +290,7 @@ func ForwardTo{{$key}}Client(s *mcpserver.MCPServer, client {{$key}}Client, opts
   s.AddTool({{$tool_name}}Tool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
     var req {{$tool_val.RequestType}}
 
-    message := request.Params.Arguments
+    message := request.GetArguments()
 
     // Extract extra properties if configured
     for _, prop := range config.ExtraProperties {

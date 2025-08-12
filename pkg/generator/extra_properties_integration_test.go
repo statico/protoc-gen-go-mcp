@@ -258,7 +258,7 @@ func TestExtraPropertiesContextIntegration(t *testing.T) {
 	// Register the tool with a handler that simulates the generated handler logic
 	mcpServer.AddTool(modifiedTool, func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		// Extract extra properties (simulating generated code)
-		message := request.Params.Arguments
+		message := request.GetArguments()
 		for _, prop := range extraProps {
 			if propVal, ok := message[prop.Name]; ok {
 				ctx = context.WithValue(ctx, prop.ContextKey, propVal)
