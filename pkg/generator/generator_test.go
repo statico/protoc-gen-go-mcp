@@ -327,7 +327,14 @@ func TestFullGeneration(t *testing.T) {
 	cmd = exec.Command("../../taskw", "fmt")
 	output, err = cmd.CombinedOutput()
 	if err != nil {
-		t.Fatalf("Failed to generate current files: %v\nOutput: %s", err, output)
+		t.Fatalf("Failed to format non-generated files: %v\nOutput: %s", err, output)
+	}
+
+	// Format generated files like the generate task does
+	cmd = exec.Command("go", "run", "mvdan.cc/gofumpt@latest", "-l", "-w", ".")
+	output, err = cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("Failed to format generated files: %v\nOutput: %s", err, output)
 	}
 
 	// Find all .pb.mcp.go files in gen/go and compare with golden/

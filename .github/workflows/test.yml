@@ -100,8 +100,8 @@ jobs:
 
     - name: Check golden files are up to date
       run: |
-        # Generate fresh files
-        go test ./pkg/generator -update-golden
+        # Generate fresh files using task (includes gofumpt formatting)
+        ./taskw generate-golden
         
         # Check if any files changed
         if ! git diff --quiet; then
