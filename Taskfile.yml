@@ -25,6 +25,7 @@ tasks:
       - echo "Updating golden test files..."
       - go test ./pkg/generator -update-golden -v
       - task: fmt
+      - gofumpt -l -w ./pkg/testdata/gen/go-golden/
       - echo "Golden files updated successfully!"
 
 
