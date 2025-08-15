@@ -19,7 +19,7 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/mark3labs/mcp-go/mcp"
-	apierrors "github.com/redpanda-data/common-go/api/errors"
+	apierrors "github.com/statico/common-go/api/errors"
 	spb "google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

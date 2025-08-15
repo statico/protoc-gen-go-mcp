@@ -39,8 +39,8 @@ github.com/openai/openai-go v1.5.0 h1:EcSBUYTiA4xbsO0VTX3i2WCPwKLMniwlVpiW/dCoXr
 github.com/openai/openai-go v1.5.0/go.mod h1:g461MYGXEXBVdV5SaR/5tNzNbSfwTBBefwc+LlDCK0Y=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/redpanda-data/common-go/api v0.0.0-20250801174835-9eea07f1ea06 h1:9Ecc+Cg1EyqSTIQ6wQKoKk8BqDlBQmR74bJui4qIqsM=
-github.com/redpanda-data/common-go/api v0.0.0-20250801174835-9eea07f1ea06/go.mod h1:klAmWfc8Q3hEZk8geFTMu6f2sk3VUKRS7cv/LvB05ig=
+github.com/statico/common-go/api v0.0.0-20250801174835-9eea07f1ea06 h1:9Ecc+Cg1EyqSTIQ6wQKoKk8BqDlBQmR74bJui4qIqsM=
+github.com/statico/common-go/api v0.0.0-20250801174835-9eea07f1ea06/go.mod h1:klAmWfc8Q3hEZk8geFTMu6f2sk3VUKRS7cv/LvB05ig=
 github.com/rogpeppe/go-internal v1.9.0 h1:73kH8U+JUqXU8lRuOHeVHaa/SZPifC7BkcraZVejAe8=
 github.com/rogpeppe/go-internal v1.9.0/go.mod h1:WtVeX8xhTBvf0smdhujwtBcq4Qrzq/fJaraNFVN+nFs=
 github.com/santhosh-tekuri/jsonschema/v5 v5.3.1 h1:lZUw3E0/J3roVtGQ+SCrUrg3ON6NgVqpn3+iol9aGu4=
