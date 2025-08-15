@@ -20,8 +20,8 @@ import (
 
 	mcpserver "github.com/mark3labs/mcp-go/server"
 	. "github.com/onsi/gomega"
-	testdata "github.com/statico/protoc-gen-go-mcp/pkg/testdata/gen/go/testdata"
-	testdatamcp "github.com/statico/protoc-gen-go-mcp/pkg/testdata/gen/go/testdata/testdatamcp"
+	testdata "github.com/redpanda-data/protoc-gen-go-mcp/pkg/testdata/gen/go/testdata"
+	testdatamcp "github.com/redpanda-data/protoc-gen-go-mcp/pkg/testdata/gen/go/testdata/testdatamcp"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -34,7 +34,7 @@ func TestEdition2023Compatibility(t *testing.T) {
 
 	// Create test implementation
 	srv := &testServerEdition2023{}
-
+	
 	// Verify that the registration function exists and can be called
 	// This confirms the code generation worked correctly
 	g.Expect(func() {

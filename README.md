@@ -1,7 +1,7 @@
 # `protoc-gen-go-mcp`
 
-[![Test](https://github.com/statico/protoc-gen-go-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/statico/protoc-gen-go-mcp/actions/workflows/test.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/statico/protoc-gen-go-mcp)](https://goreportcard.com/report/github.com/statico/protoc-gen-go-mcp)
+[![Test](https://github.com/redpanda-data/protoc-gen-go-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/redpanda-data/protoc-gen-go-mcp/actions/workflows/test.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/redpanda-data/protoc-gen-go-mcp)](https://goreportcard.com/report/github.com/redpanda-data/protoc-gen-go-mcp)
 [![codecov](https://codecov.io/gh/redpanda-data/protoc-gen-go-mcp/branch/main/graph/badge.svg)](https://codecov.io/gh/redpanda-data/protoc-gen-go-mcp)
 
 **`protoc-gen-go-mcp`** is a [Protocol Buffers](https://protobuf.dev) compiler plugin that generates [Model Context Protocol (MCP)](https://modelcontextprotocol.io) servers for your `gRPC` or `ConnectRPC` APIs.
@@ -12,11 +12,11 @@ It generates `*.pb.mcp.go` files for each protobuf service, enabling you to dele
 
 ## ✨ Features
 
-- 🚀 Auto-generates MCP handlers from your `.proto` services
-- 📦 Outputs JSON Schema for method inputs
-- 🔄 Wire up to gRPC or ConnectRPC servers/clients
-- 🧩 Easy integration with [`buf`](https://buf.build)
-- 🎯 **Runtime LLM provider selection** - Choose between standard MCP and OpenAI-compatible schemas at runtime
+- 🚀 Auto-generates MCP handlers from your `.proto` services  
+- 📦 Outputs JSON Schema for method inputs  
+- 🔄 Wire up to gRPC or ConnectRPC servers/clients  
+- 🧩 Easy integration with [`buf`](https://buf.build)  
+- 🎯 **Runtime LLM provider selection** - Choose between standard MCP and OpenAI-compatible schemas at runtime  
 
 ## 🔧 Usage
 
@@ -29,7 +29,7 @@ plugins:
   - local:
       - go
       - run
-      - github.com/statico/protoc-gen-go-mcp/cmd/protoc-gen-go-mcp@latest
+      - github.com/redpanda-data/protoc-gen-go-mcp/cmd/protoc-gen-go-mcp@latest
     out: ./gen/go
     opt: paths=source_relative
 ```
@@ -100,7 +100,7 @@ testdatamcp.RegisterTestServiceHandlerWithProvider(mcpServer, &srv, provider)
 
 ### Wiring up with grpc and connectrpc client
 
-It is also possible to directly forward MCP tool calls to gRPC clients.
+It is also possible to directly forward MCP tool calls to gRPC clients. 
 
 ```go
 testdatamcp.ForwardToTestServiceClient(mcpServer, myGrpcClient)
@@ -144,7 +144,7 @@ The generator now creates both standard MCP and OpenAI-compatible handlers autom
 - Maps represented as JSON objects
 - Well-known types use native JSON representations
 
-### OpenAI Compatible
+### OpenAI Compatible  
 - Restricted JSON Schema (no additionalProperties, anyOf, oneOf)
 - Maps converted to arrays of key-value pairs
 - Well-known types (Struct, Value, ListValue) encoded as JSON strings

@@ -8,7 +8,7 @@ import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	testdata "github.com/statico/protoc-gen-go-mcp/pkg/testdata/gen/go/testdata"
+	testdata "github.com/redpanda-data/protoc-gen-go-mcp/pkg/testdata/gen/go/testdata"
 	http "net/http"
 	strings "strings"
 )
