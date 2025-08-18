@@ -29,6 +29,11 @@ func main() {
 		"mcp",
 		"Generate files into a sub-package of the package containing the base .pb.go files using the given suffix. An empty suffix denotes to generate into the same package as the base pb.go files.",
 	)
+	importRewrite := flagSet.String(
+		"import_rewrite",
+		"",
+		"Rewrite import paths in the format 'from=to'. Example: 'buf.build/gen/go/example=github.com/example/gen/buf.build/gen/go/example'",
+	)
 
 	protogen.Options{
 		ParamFunc: flagSet.Set,
@@ -42,7 +47,7 @@ func main() {
 			if !f.Generate {
 				continue
 			}
-			generator.NewFileGenerator(f, gen).Generate(*packageSuffix)
+			generator.NewFileGenerator(f, gen, *importRewrite).Generate(*packageSuffix)
 		}
 		return nil
 	})
