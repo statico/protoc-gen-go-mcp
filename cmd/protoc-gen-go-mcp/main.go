@@ -34,6 +34,11 @@ func main() {
 		"",
 		"Prefix to add to generated import paths. Example: 'github.com/example/gen' will transform 'buf.build/gen/go/example' to 'github.com/example/gen/buf.build/gen/go/example'",
 	)
+	trimToolPrefixes := flagSet.Bool(
+		"trim_tool_prefixes",
+		false,
+		"Remove the most common leading substring from every tool name prior to mangling",
+	)
 
 	protogen.Options{
 		ParamFunc: flagSet.Set,
@@ -47,7 +52,7 @@ func main() {
 			if !f.Generate {
 				continue
 			}
-			generator.NewFileGenerator(f, gen, *packagePrefix).Generate(*packageSuffix)
+			generator.NewFileGenerator(f, gen, *packagePrefix).Generate(*packageSuffix, *trimToolPrefixes)
 		}
 		return nil
 	})
