@@ -20,8 +20,8 @@ import (
 
 	mcpserver "github.com/mark3labs/mcp-go/server"
 	. "github.com/onsi/gomega"
-	testdata "github.com/redpanda-data/protoc-gen-go-mcp/pkg/testdata/gen/go/testdata"
-	testdatamcp "github.com/redpanda-data/protoc-gen-go-mcp/pkg/testdata/gen/go/testdata/testdatamcp"
+	testdata "github.com/statico/protoc-gen-go-mcp/pkg/testdata/gen/go/testdata"
+	testdatamcp "github.com/statico/protoc-gen-go-mcp/pkg/testdata/gen/go/testdata/testdatamcp"
 	"google.golang.org/protobuf/proto"
 )
 
