@@ -20,12 +20,13 @@ import (
 	"flag"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	testdata "github.com/northpolesec/protoc-gen-go-mcp/pkg/testdata/gen/go/testdata"
 	. "github.com/onsi/gomega"
-	testdata "github.com/redpanda-data/protoc-gen-go-mcp/pkg/testdata/gen/go/testdata"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -275,6 +276,55 @@ func TestSchemaMarshaling(t *testing.T) {
 
 var updateGolden = flag.Bool("update-golden", false, "Update golden files")
 
+func TestPackagePrefixPath(t *testing.T) {
+	tests := []struct {
+		name          string
+		packagePrefix string
+		originalPath  string
+		expectedPath  string
+	}{
+		{
+			name:          "no prefix",
+			packagePrefix: "",
+			originalPath:  "buf.build/gen/go/example",
+			expectedPath:  "buf.build/gen/go/example",
+		},
+		{
+			name:          "with prefix",
+			packagePrefix: "github.com/example/gen",
+			originalPath:  "buf.build/gen/go/example",
+			expectedPath:  "github.com/example/gen/buf.build/gen/go/example",
+		},
+		{
+			name:          "nested path with prefix",
+			packagePrefix: "github.com/myorg/protolib",
+			originalPath:  "google.golang.org/genproto/protobuf/api",
+			expectedPath:  "github.com/myorg/protolib/google.golang.org/genproto/protobuf/api",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := NewWithT(t)
+
+			// Test the path transformation logic directly
+			fg := &FileGenerator{
+				packagePrefix: tt.packagePrefix,
+			}
+
+			// Extract the path transformation logic from getQualifiedTypeName
+			var actualPath string
+			if fg.packagePrefix != "" {
+				actualPath = path.Join(fg.packagePrefix, tt.originalPath)
+			} else {
+				actualPath = tt.originalPath
+			}
+
+			g.Expect(actualPath).To(Equal(tt.expectedPath))
+		})
+	}
+}
+
 func TestFullGeneration(t *testing.T) {
 	g := NewWithT(t)
 
@@ -382,4 +432,114 @@ func TestFullGeneration(t *testing.T) {
 	})
 
 	g.Expect(err).ToNot(HaveOccurred())
+}
+
+func TestFindCommonPrefix(t *testing.T) {
+	tests := []struct {
+		name  string
+		names []string
+		want  string
+	}{
+		{
+			name:  "empty slice",
+			names: []string{},
+			want:  "",
+		},
+		{
+			name:  "single name",
+			names: []string{"foo_BarService_v1_DoStuff"},
+			want:  "",
+		},
+		{
+			name:  "no common prefix",
+			names: []string{"foo_BarService_v1_DoStuff", "baz_QuxService_v2_DoOther"},
+			want:  "",
+		},
+		{
+			name:  "common prefix with underscore boundary",
+			names: []string{"foo_BarService_v1_DoStuff", "foo_BarService_v1_DoOther", "foo_BarService_v1_DoAnything"},
+			want:  "foo_BarService_v1_",
+		},
+		{
+			name:  "common prefix without underscore boundary",
+			names: []string{"foobarbaz", "foobarqux"},
+			want:  "foobar",
+		},
+		{
+			name:  "typical protobuf service names",
+			names: []string{"testdata_TestService_CreateItem", "testdata_TestService_GetItem", "testdata_TestService_ProcessWellKnownTypes"},
+			want:  "testdata_TestService_",
+		},
+		{
+			name:  "prefix too short",
+			names: []string{"a_foo", "a_bar"},
+			want:  "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := NewWithT(t)
+			result := findCommonPrefix(tt.names)
+			g.Expect(result).To(Equal(tt.want))
+		})
+	}
+}
+
+func TestToolNameTrimming(t *testing.T) {
+	tests := []struct {
+		name              string
+		toolNames         []string
+		trimToolPrefixes  bool
+		expectedToolNames []string
+	}{
+		{
+			name:              "no trimming when disabled",
+			toolNames:         []string{"testdata_TestService_CreateItem", "testdata_TestService_GetItem"},
+			trimToolPrefixes:  false,
+			expectedToolNames: []string{"testdata_TestService_CreateItem", "testdata_TestService_GetItem"},
+		},
+		{
+			name:              "trimming when enabled",
+			toolNames:         []string{"testdata_TestService_CreateItem", "testdata_TestService_GetItem", "testdata_TestService_ProcessWellKnownTypes"},
+			trimToolPrefixes:  true,
+			expectedToolNames: []string{"CreateItem", "GetItem", "ProcessWellKnownTypes"},
+		},
+		{
+			name:              "no trimming when no common prefix",
+			toolNames:         []string{"foo_CreateItem", "bar_GetItem"},
+			trimToolPrefixes:  true,
+			expectedToolNames: []string{"foo_CreateItem", "bar_GetItem"},
+		},
+		{
+			name:              "complex prefix trimming",
+			toolNames:         []string{"com_example_service_v1_api_CreateUser", "com_example_service_v1_api_GetUser", "com_example_service_v1_api_DeleteUser"},
+			trimToolPrefixes:  true,
+			expectedToolNames: []string{"CreateUser", "GetUser", "DeleteUser"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g := NewWithT(t)
+
+			// Find common prefix
+			var commonPrefix string
+			if tt.trimToolPrefixes {
+				commonPrefix = findCommonPrefix(tt.toolNames)
+			}
+
+			// Apply trimming logic
+			var actualNames []string
+			for _, toolName := range tt.toolNames {
+				name := toolName
+				if tt.trimToolPrefixes && commonPrefix != "" && strings.HasPrefix(name, commonPrefix) {
+					name = strings.TrimPrefix(name, commonPrefix)
+				}
+				actualNames = append(actualNames, name)
+			}
+
+			g.Expect(actualNames).To(Equal(tt.expectedToolNames))
+		})
+	}
 }

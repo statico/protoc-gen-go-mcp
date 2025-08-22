@@ -16,8 +16,10 @@ package main
 import (
 	"flag"
 
-	"github.com/redpanda-data/protoc-gen-go-mcp/pkg/generator"
+	"github.com/northpolesec/protoc-gen-go-mcp/pkg/generator"
 	"google.golang.org/protobuf/compiler/protogen"
+	"google.golang.org/protobuf/types/descriptorpb"
+	"google.golang.org/protobuf/types/pluginpb"
 )
 
 func main() {
@@ -27,15 +29,30 @@ func main() {
 		"mcp",
 		"Generate files into a sub-package of the package containing the base .pb.go files using the given suffix. An empty suffix denotes to generate into the same package as the base pb.go files.",
 	)
+	packagePrefix := flagSet.String(
+		"package_prefix",
+		"",
+		"Prefix to add to generated import paths. Example: 'github.com/example/gen' will transform 'buf.build/gen/go/example' to 'github.com/example/gen/buf.build/gen/go/example'",
+	)
+	trimToolPrefixes := flagSet.Bool(
+		"trim_tool_prefixes",
+		false,
+		"Remove the most common leading substring from every tool name prior to mangling",
+	)
 
 	protogen.Options{
 		ParamFunc: flagSet.Set,
 	}.Run(func(gen *protogen.Plugin) error {
+		// Set supported editions and features on the plugin
+		gen.SupportedFeatures = uint64(pluginpb.CodeGeneratorResponse_FEATURE_SUPPORTS_EDITIONS)
+		gen.SupportedEditionsMinimum = descriptorpb.Edition_EDITION_PROTO2
+		gen.SupportedEditionsMaximum = descriptorpb.Edition_EDITION_2023
+
 		for _, f := range gen.Files {
 			if !f.Generate {
 				continue
 			}
-			generator.NewFileGenerator(f, gen).Generate(*packageSuffix)
+			generator.NewFileGenerator(f, gen, *packagePrefix).Generate(*packageSuffix, *trimToolPrefixes)
 		}
 		return nil
 	})
